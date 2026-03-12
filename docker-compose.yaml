@@ -1,0 +1,13 @@
+services:
+  nice-bauch:
+    image: 192.168.1.41:3000/mattia/scruzzi--website/nice-bauch:latest
+    container_name: nice-bauch
+    restart: unless-stopped
+    ports:
+      - "8085:80"
+    networks:
+      - nice-bauch-net
+
+networks:
+  nice-bauch-net:
+    driver: bridge

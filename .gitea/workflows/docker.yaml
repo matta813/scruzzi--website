@@ -35,9 +35,13 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          # Einfacheres Tagging-Schema für Gitea
-          IMAGE_TAG_LATEST="192.168.1.41:3000/mattia/nice-bauch:latest"
-          IMAGE_TAG_SHA="192.168.1.41:3000/mattia/nice-bauch:${{ github.sha }}"
+          # Pfade in Kleinschreibung konvertieren
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(echo "scruzzi--website" | tr '[:upper:]' '[:lower:]')
+          
+          # Tagging-Schema exakt wie in npm-stats: REGISTRY/OWNER/REPO/IMAGE:TAG
+          IMAGE_TAG_LATEST="192.168.1.41:3000/${REPO_OWNER}/${REPO_NAME}/nice-bauch:latest"
+          IMAGE_TAG_SHA="192.168.1.41:3000/${REPO_OWNER}/${REPO_NAME}/nice-bauch:${{ github.sha }}"
           
           echo "Bauen: ${IMAGE_TAG_LATEST}"
           docker build -t ${IMAGE_TAG_LATEST} -t ${IMAGE_TAG_SHA} .

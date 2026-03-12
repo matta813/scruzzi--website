@@ -1,39 +1,30 @@
 #!/usr/bin/env bash
 set -e
 
-PORT=8085
-IMAGE="192.168.1.41:3000/mattia/nice-bauch:latest"
-CONTAINER_NAME="nice-bauch"
-
-echo "Setze nice-bauch Docker-Container auf Port $PORT auf..."
+echo "Starte nice-bauch Deployment mit Docker Compose..."
 
 # Firewall öffnen, falls ufw aktiv ist
 if command -v ufw >/dev/null 2>&1; then
-  echo "Öffne Port $PORT in ufw (sudo erforderlich)"
-  sudo ufw allow $PORT/tcp || echo "Port $PORT bereits freigegeben"
+  sudo ufw allow 8085/tcp || echo "Port 8085 bereits freigegeben"
 fi
 
-# Prüfen ob docker vorhanden ist
-if ! command -v docker >/dev/null 2>&1; then
-  echo "Docker nicht gefunden! Installiere mit:"
-  echo "sudo apt update && sudo apt install -y docker.io"
+# Prüfen ob docker-compose oder docker compose vorhanden ist
+if command -v docker-compose >/dev/null 2>&1; then
+  DOCKER_COMPOSE="docker-compose"
+elif docker compose version >/dev/null 2>&1; then
+  DOCKER_COMPOSE="docker compose"
+else
+  echo "Docker Compose nicht gefunden!"
   exit 1
 fi
 
-# Alten Container stoppen und entfernen
-if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
-    echo "Stoppe und entferne alten Container..."
-    docker stop "$CONTAINER_NAME"
-    docker rm "$CONTAINER_NAME"
-fi
+# Lokaler Build als Fallback (falls Registry-Login fehlt)
+echo "Baue Image lokal (als Fallback)..."
+docker build -t 192.168.1.41:3000/mattia/scruzzi--website/nice-bauch:latest .
 
-# Neuen Container starten
-echo "Starte neuen Container auf Port $PORT..."
-docker run -d \
-  --name "$CONTAINER_NAME" \
-  --restart unless-stopped \
-  -p "$PORT:80" \
-  "$IMAGE"
+# Deployment mit Docker Compose
+echo "Führe $DOCKER_COMPOSE up -d aus..."
+$DOCKER_COMPOSE up -d --force-recreate
 
-echo "Server erreichbar unter: http://$(hostname -I | awk '{print $1}'):$PORT"
-docker ps -f name=$CONTAINER_NAME
+echo "Server erreichbar unter: http://$(hostname -I | awk '{print $1}'):8085"
+$DOCKER_COMPOSE ps

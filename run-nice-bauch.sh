@@ -2,9 +2,10 @@
 set -e
 
 PORT=8085
-WWW_DIR="$(cd "$(dirname "$0")" && pwd)"
+IMAGE="192.168.1.41:3000/mattia/nice-bauch:latest"
+CONTAINER_NAME="nice-bauch"
 
-echo "Starte nice-bauch auf Port $PORT im Verzeichnis $WWW_DIR"
+echo "Setze nice-bauch Docker-Container auf Port $PORT auf..."
 
 # Firewall öffnen, falls ufw aktiv ist
 if command -v ufw >/dev/null 2>&1; then
@@ -12,14 +13,27 @@ if command -v ufw >/dev/null 2>&1; then
   sudo ufw allow $PORT/tcp || echo "Port $PORT bereits freigegeben"
 fi
 
-# Prüfen ob python3 vorhanden ist
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "python3 nicht gefunden! Installiere mit:"
-  echo "sudo apt update && sudo apt install -y python3"
+# Prüfen ob docker vorhanden ist
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Docker nicht gefunden! Installiere mit:"
+  echo "sudo apt update && sudo apt install -y docker.io"
   exit 1
 fi
 
-# Server starten
-cd "$WWW_DIR"
+# Alten Container stoppen und entfernen
+if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
+    echo "Stoppe und entferne alten Container..."
+    docker stop "$CONTAINER_NAME"
+    docker rm "$CONTAINER_NAME"
+fi
+
+# Neuen Container starten
+echo "Starte neuen Container auf Port $PORT..."
+docker run -d \
+  --name "$CONTAINER_NAME" \
+  --restart unless-stopped \
+  -p "$PORT:80" \
+  "$IMAGE"
+
 echo "Server erreichbar unter: http://$(hostname -I | awk '{print $1}'):$PORT"
-python3 -m http.server $PORT --bind 0.0.0.0
+docker ps -f name=$CONTAINER_NAME

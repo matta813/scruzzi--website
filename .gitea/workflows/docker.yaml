@@ -29,21 +29,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: actions/setup-buildx-action@v3
-
       - name: Login to Gitea Container Registry
-        uses: actions/login-action@v3
-        with:
-          registry: git.scruzzi.com
-          username: ${{ gitea.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login git.scruzzi.com -u ${{ gitea.actor }} --password-stdin
 
       - name: Build and Push Docker Image
-        uses: actions/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            git.scruzzi.com/${{ gitea.repository }}:latest
-            git.scruzzi.com/${{ gitea.repository }}:${{ gitea.sha }}
+        run: |
+          # Image Tags definieren
+          REPO_LOWER=$(echo "${{ gitea.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_TAG_LATEST="git.scruzzi.com/${REPO_LOWER}:latest"
+          IMAGE_TAG_SHA="git.scruzzi.com/${REPO_LOWER}:${{ gitea.sha }}"
+          
+          echo "Bauen: ${IMAGE_TAG_LATEST}"
+          docker build -t ${IMAGE_TAG_LATEST} -t ${IMAGE_TAG_SHA} .
+          
+          echo "Pushen..."
+          docker push ${IMAGE_TAG_LATEST}
+          docker push ${IMAGE_TAG_SHA}

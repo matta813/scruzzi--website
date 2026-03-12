@@ -43,6 +43,11 @@
       border:1px solid rgba(255,255,255,0.08);
       box-shadow:0 20px 50px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.02);
       overflow:hidden;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+    }
+    .card.pulse {
+      transform: scale(1.02);
+      box-shadow: 0 0 40px rgba(23, 230, 161, 0.3);
     }
     .grid{
       display:grid;
@@ -52,21 +57,56 @@
     }
     h1{font-weight:700;font-size:clamp(30px,6vw,60px);margin:0 0 0.35rem;letter-spacing:-0.01em;}
     p.sub{margin:0 0 1.4rem;color:rgba(233,238,247,0.78);font-weight:600;font-size:1.05rem;}
-    .pill{
+    
+    .interactive-area {
+      margin: 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .pill-btn {
       display:inline-flex;
       align-items:center;
+      justify-content: center;
       gap:0.6rem;
-      padding:0.75rem 1.3rem;
+      padding:1rem 2rem;
       border-radius:999px;
       background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
       color:#041016;
-      font-weight:700;
+      font-weight:800;
+      font-size: 1.1rem;
       letter-spacing:0.3px;
       box-shadow:0 12px 30px rgba(23,230,161,0.3), 0 0 0 1px rgba(4,16,22,0.1);
       transform:translateZ(0);
-      transition:transform 180ms ease, box-shadow 180ms ease;
+      transition:transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
-    .pill:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(23,230,161,0.35),0 0 0 1px rgba(4,16,22,0.18);}
+    .pill-btn:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(23,230,161,0.35),0 0 0 1px rgba(4,16,22,0.18);}
+    .pill-btn:active{transform:translateY(1px); filter: brightness(0.9);}
+
+    .meter-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-1);
+      margin-bottom: -0.5rem;
+    }
+
+    .counter-val {
+      font-family: monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(to bottom, #fff, rgba(255,255,255,0.5));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
     .meta{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;color:rgba(233,238,247,0.7);}
     .chip{
       padding:0.55rem 0.95rem;
@@ -106,6 +146,16 @@
       pointer-events:none;
       mix-blend-mode:screen;
     }
+
+    #quote-box {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--accent-2);
+      min-height: 1.2rem;
+      margin-top: 0.5rem;
+      opacity: 0.8;
+    }
+
     @keyframes drift{
       from{transform:translate3d(0,0,0) rotate(0deg);}
       to{transform:translate3d(0,0,0) rotate(360deg);}
@@ -123,26 +173,74 @@
 </head>
 <body>
   <div class="shell"></div>
-  <div class="card">
+  <div class="card" id="main-card">
     <div class="glow"></div>
     <div class="grid">
       <div>
         <div class="badge">aktiv</div>
         <h1>nice Bauch</h1>
         <p class="sub">läuft auf einem festen Port 🎯</p>
-        <div class="pill">nice Bauch</div>
+        
+        <div class="interactive-area">
+          <span class="meter-label">Nice-Level</span>
+          <div class="counter-val" id="counter">0</div>
+          <button class="pill-btn" id="nice-btn">Bauch streicheln ✨</button>
+          <div id="quote-box"></div>
+        </div>
+
         <div class="meta">
           <div class="chip">Port 8085</div>
           <div class="chip">leichtgewichtig</div>
-          <div class="chip">bereit</div>
+          <div class="chip">interaktiv</div>
         </div>
       </div>
       <div class="panel">
         <h2>Was steckt dahinter?</h2>
-        <p>Ein schlankes Single-Page-Setup, bereit, sofort zu liefern. Minimaler Overhead, klarer Fokus auf den Kerninhalt, stabil auf deinem Server.</p>
-        <footer>Ubuntu Server — powered by Python3</footer>
+        <p>Ein interaktives Single-Page-Setup. Minimaler Overhead, voller Fokus auf das "Nice-Level". Dein Fortschritt wird lokal gespeichert.</p>
+        <footer>Ubuntu Server — powered by JS & Python3</footer>
       </div>
     </div>
   </div>
+
+  <script>
+    const btn = document.getElementById('nice-btn');
+    const counterEl = document.getElementById('counter');
+    const card = document.getElementById('main-card');
+    const quoteBox = document.getElementById('quote-box');
+
+    const quotes = [
+      "Sehr nice!",
+      "Das ist ein guter Bauch.",
+      "Stabil!",
+      "Unglaubliches Level.",
+      "Weiter so!",
+      "Bauch-Gefühl: 10/10",
+      "Qualitäts-Bauch.",
+      "Legendär!"
+    ];
+
+    let count = parseInt(localStorage.getItem('niceCount')) || 0;
+    counterEl.innerText = count;
+
+    btn.addEventListener('click', () => {
+      count++;
+      counterEl.innerText = count;
+      localStorage.setItem('niceCount', count);
+
+      // Animation
+      card.classList.remove('pulse');
+      void card.offsetWidth; // Trigger reflow
+      card.classList.add('pulse');
+      
+      // Random Quote
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteBox.innerText = randomQuote;
+
+      // Reset animation after 200ms
+      setTimeout(() => {
+        card.classList.remove('pulse');
+      }, 200);
+    });
+  </script>
 </body>
 </html>

@@ -35,7 +35,7 @@ jobs:
       - name: Login to Gitea Container Registry
         uses: actions/login-action@v3
         with:
-          registry: 192.168.1.41
+          registry: git.scruzzi.com
           username: ${{ gitea.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -45,5 +45,5 @@ jobs:
           context: .
           push: true
           tags: |
-            192.168.1.41/${{ gitea.repository }}:latest
-            192.168.1.41/${{ gitea.repository }}:${{ gitea.sha }}
+            git.scruzzi.com/${{ gitea.repository }}:latest
+            git.scruzzi.com/${{ gitea.repository }}:${{ gitea.sha }}

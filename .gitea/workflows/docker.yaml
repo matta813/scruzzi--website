@@ -1,0 +1,49 @@
+name: Lint & Build Docker Image
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (for HTML Hint)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install HTMLHint
+        run: npm install -g htmlhint
+
+      - name: Lint HTML Code
+        run: htmlhint index.html
+
+  build-and-push:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: Login to Gitea Container Registry
+        uses: actions/login-action@v3
+        with:
+          registry: 192.168.1.41
+          username: ${{ gitea.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: actions/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            192.168.1.41/${{ gitea.repository }}:latest
+            192.168.1.41/${{ gitea.repository }}:${{ gitea.sha }}

@@ -20,7 +20,7 @@ fi
 
 # Lokaler Build als Fallback (falls Registry-Login fehlt)
 echo "Baue Image lokal (als Fallback)..."
-docker build -t 192.168.1.41:3000/mattia/scruzzi--website/nice-bauch:latest .
+docker build -t ghcr.io/scruzzimattia-blip/scruzzi-website/nice-bauch:latest .
 
 # Deployment mit Docker Compose
 echo "Führe $DOCKER_COMPOSE up -d aus..."

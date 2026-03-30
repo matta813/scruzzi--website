@@ -1,10 +1,15 @@
 services:
   nice-bauch:
-    image: 192.168.1.41:3000/mattia/scruzzi--website/nice-bauch:latest
+    image: ghcr.io/scruzzimattia-blip/scruzzi-website/nice-bauch:latest
     container_name: nice-bauch
     restart: unless-stopped
     ports:
-      - "8085:80"
+      - "8085:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - nice-bauch-net
 

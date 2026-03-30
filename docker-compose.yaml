@@ -1,7 +1,7 @@
 services:
   nice-bauch:
     build: .
-    image: ghcr.io/scruzzimattia-blip/scruzzi-website/nice-bauch:latest
+    image: nice-bauch:local
     container_name: nice-bauch
     restart: unless-stopped
     ports:

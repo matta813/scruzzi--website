@@ -18,13 +18,18 @@ else
   exit 1
 fi
 
-# Lokaler Build als Fallback (falls Registry-Login fehlt)
-echo "Baue Image lokal (als Fallback)..."
-docker build -t ghcr.io/scruzzimattia-blip/scruzzi-website/nice-bauch:latest .
-
 # Deployment mit Docker Compose
-echo "Führe $DOCKER_COMPOSE up -d aus..."
-$DOCKER_COMPOSE up -d --force-recreate
+echo "Führe $DOCKER_COMPOSE up -d --build aus..."
+$DOCKER_COMPOSE up -d --build --force-recreate
 
-echo "Server erreichbar unter: http://$(hostname -I | awk '{print $1}'):8085"
+# Cross-platform check for IP address
+if command -v ipconfig >/dev/null 2>&1; then
+  IP_ADDR=$(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo "localhost")
+elif command -v hostname >/dev/null 2>&1 && hostname -I >/dev/null 2>&1; then
+  IP_ADDR=$(hostname -I | awk '{print $1}')
+else
+  IP_ADDR="localhost"
+fi
+
+echo "Server erreichbar unter: http://${IP_ADDR}:8085"
 $DOCKER_COMPOSE ps

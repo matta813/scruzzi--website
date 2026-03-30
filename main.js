@@ -30,7 +30,7 @@
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 },
-          colors: ['#17e6a1', '#fbbf24', '#ffffff']
+          colors: ['#60a5fa', '#c084fc', '#ffffff']
         });
       }
 

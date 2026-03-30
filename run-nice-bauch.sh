@@ -20,6 +20,7 @@ fi
 
 # Deployment mit Docker Compose
 echo "Führe $DOCKER_COMPOSE up -d --build aus..."
+$DOCKER_COMPOSE build --no-cache
 $DOCKER_COMPOSE up -d --build --force-recreate
 
 # Cross-platform check for IP address

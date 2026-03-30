@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js (for HTML Hint)
         uses: actions/setup-node@v4
@@ -25,23 +25,28 @@ jobs:
   build-and-push:
     needs: lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Login to Gitea Registry
-        run: |
-          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login 192.168.1.41:3000 --username "${{ github.actor }}" --password-stdin
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Docker Image
         run: |
           # Pfade in Kleinschreibung konvertieren
           REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          REPO_NAME=$(echo "scruzzi--website" | tr '[:upper:]' '[:lower:]')
+          REPO_NAME="scruzzi-website"
           
-          # Tagging-Schema exakt wie in npm-stats: REGISTRY/OWNER/REPO/IMAGE:TAG
-          IMAGE_TAG_LATEST="192.168.1.41:3000/${REPO_OWNER}/${REPO_NAME}/nice-bauch:latest"
-          IMAGE_TAG_SHA="192.168.1.41:3000/${REPO_OWNER}/${REPO_NAME}/nice-bauch:${{ github.sha }}"
+          IMAGE_TAG_LATEST="ghcr.io/${REPO_OWNER}/${REPO_NAME}/nice-bauch:latest"
+          IMAGE_TAG_SHA="ghcr.io/${REPO_OWNER}/${REPO_NAME}/nice-bauch:${{ github.sha }}"
           
           echo "Bauen: ${IMAGE_TAG_LATEST}"
           docker build -t ${IMAGE_TAG_LATEST} -t ${IMAGE_TAG_SHA} .

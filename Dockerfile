@@ -1,13 +1,22 @@
-# Schlankes, unprivilegiertes Nginx-Image als Basis (Sicherheit)
-FROM nginxinc/nginx-unprivileged:alpine
+FROM python:3.13-alpine
 
-# Kopiere die statischen Dateien in das Nginx-Verzeichnis
-COPY index.html /usr/share/nginx/html/index.html
-COPY style.css /usr/share/nginx/html/style.css
-COPY main.js /usr/share/nginx/html/main.js
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    NICE_BAUCH_DB=/data/nice-bauch.sqlite
 
-# Kopiere die Nginx-Konfiguration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-# Exponiere Port 8080 (Standard für unprivileged Nginx)
+RUN addgroup -S app && adduser -S -G app app \
+    && mkdir -p /app/public /data \
+    && chown -R app:app /app /data
+
+COPY server.py /app/server.py
+COPY index.html /app/public/index.html
+COPY style.css /app/public/style.css
+COPY main.js /app/public/main.js
+
+USER app
+
 EXPOSE 8080
+
+CMD ["python", "/app/server.py"]

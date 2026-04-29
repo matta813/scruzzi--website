@@ -5,8 +5,10 @@ const card = document.getElementById('main-card');
 const quoteBox = document.getElementById('quote-box');
 const progressBar = document.getElementById('progress-bar');
 const milestoneEl = document.getElementById('milestone');
+const deviceChip = document.getElementById('device-chip');
 
 const milestoneSize = 10;
+const deviceStorageKey = 'niceDeviceId';
 
 const quotes = [
   "Sehr nice!",
@@ -45,7 +47,35 @@ const quotes = [
   "Ein wahrer Traum!"
 ];
 
-let count = Number.parseInt(localStorage.getItem('niceCount'), 10) || 0;
+let count = 0;
+
+function createDeviceId() {
+  if (crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (value) =>
+    (Number(value) ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> Number(value) / 4).toString(16)
+  );
+}
+
+function getDeviceId() {
+  const existingDeviceId = localStorage.getItem(deviceStorageKey);
+
+  if (existingDeviceId) {
+    return existingDeviceId;
+  }
+
+  const newDeviceId = createDeviceId();
+  localStorage.setItem(deviceStorageKey, newDeviceId);
+  return newDeviceId;
+}
+
+const deviceId = getDeviceId();
+
+function shortDeviceId() {
+  return deviceId.split('-')[0];
+}
 
 function updateDashboard() {
   const milestoneProgress = count % milestoneSize;
@@ -59,6 +89,38 @@ function updateDashboard() {
     milestoneEl.textContent = `${milestoneSize} / ${milestoneSize}`;
     progressBar.style.width = '100%';
   }
+}
+
+function setLoading(isLoading) {
+  btn.disabled = isLoading;
+  resetBtn.disabled = isLoading;
+}
+
+async function requestDeviceState(path = '', options = {}) {
+  const response = await fetch(`/api/devices/${deviceId}${path}`, {
+    headers: {
+      'Accept': 'application/json'
+    },
+    ...options
+  });
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+function applyServerState(serverState) {
+  count = serverState.count;
+  updateDashboard();
+}
+
+function showOfflineHint() {
+  const localFallback = Number.parseInt(localStorage.getItem('niceCountFallback'), 10) || 0;
+  count = localFallback;
+  updateDashboard();
+  quoteBox.textContent = 'Server gerade nicht erreichbar. Lokaler Fallback aktiv.';
 }
 
 function pulseCard() {
@@ -84,24 +146,56 @@ function celebrateMilestone() {
   });
 }
 
-btn.addEventListener('click', () => {
-  count += 1;
-  localStorage.setItem('niceCount', count);
+btn.addEventListener('click', async () => {
+  setLoading(true);
 
-  updateDashboard();
-  celebrateMilestone();
-  pulseCard();
+  try {
+    const serverState = await requestDeviceState('/increment', { method: 'POST' });
+    applyServerState(serverState);
+    localStorage.setItem('niceCountFallback', count);
+    celebrateMilestone();
+    pulseCard();
 
-  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-  quoteBox.textContent = randomQuote;
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    quoteBox.textContent = randomQuote;
+  } catch (error) {
+    quoteBox.textContent = 'Speichern fehlgeschlagen. Bitte Server prüfen.';
+  } finally {
+    setLoading(false);
+  }
 });
 
-resetBtn.addEventListener('click', () => {
-  count = 0;
-  localStorage.setItem('niceCount', count);
-  quoteBox.textContent = 'Zurück auf Start. Der Bauch bleibt trotzdem nice.';
-  updateDashboard();
-  pulseCard();
+resetBtn.addEventListener('click', async () => {
+  setLoading(true);
+
+  try {
+    const serverState = await requestDeviceState('/reset', { method: 'POST' });
+    applyServerState(serverState);
+    localStorage.setItem('niceCountFallback', count);
+    quoteBox.textContent = 'Zurück auf Start. Der Bauch bleibt trotzdem nice.';
+    pulseCard();
+  } catch (error) {
+    quoteBox.textContent = 'Reset fehlgeschlagen. Bitte Server prüfen.';
+  } finally {
+    setLoading(false);
+  }
 });
+
+async function boot() {
+  deviceChip.textContent = `Gerät ${shortDeviceId()}`;
+
+  try {
+    setLoading(true);
+    const serverState = await requestDeviceState();
+    applyServerState(serverState);
+    localStorage.setItem('niceCountFallback', count);
+    quoteBox.textContent = 'Server-Speicher verbunden. Bereit für die nächste Streicheleinheit.';
+  } catch (error) {
+    showOfflineHint();
+  } finally {
+    setLoading(false);
+  }
+}
 
 updateDashboard();
+boot();

@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <meta name="description"
     content="Ein interaktives Single-Page-Setup. Minimaler Overhead, voller Fokus auf das Nice-Level." />
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 
 <body>
@@ -54,7 +54,7 @@
         <div class="meta">
           <div class="chip">Port 8085</div>
           <div class="chip">GHCR Image</div>
-          <div class="chip">Versioned Releases</div>
+          <div class="chip" id="device-chip">Gerät wird erkannt</div>
         </div>
       </main>
 
@@ -66,24 +66,24 @@
         <div class="status-list">
           <div>
             <strong>Runtime</strong>
-            <span>Nginx unprivileged</span>
+            <span>Python API Server</span>
           </div>
           <div>
-            <strong>Registry</strong>
-            <span>GitHub Container Registry</span>
+            <strong>Datenbank</strong>
+            <span>SQLite im Docker Volume</span>
           </div>
           <div>
             <strong>State</strong>
-            <span>Lokal im Browser gespeichert</span>
+            <span>Pro Gerät serverseitig gespeichert</span>
           </div>
         </div>
 
-        <footer>Ubuntu Server · powered by JS & Nginx</footer>
+        <footer>Ubuntu Server · powered by JS, Python & SQLite</footer>
       </div>
     </div>
   </div>
 
-  <script src="main.js?v=4"></script>
+  <script src="main.js?v=5"></script>
 </body>
 
 </html>

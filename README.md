@@ -13,4 +13,5 @@ Einfach das mitgelieferte Skript ausführen (erfordert Docker & Docker Compose):
 ```bash
 ./run-nice-bauch.sh
 ```
+Das Skript zieht das aktuelle Image aus der GitHub Container Registry und startet es lokal.
 Der Server ist dann standardmäßig unter Port **8085** erreichbar: `http://localhost:8085`.

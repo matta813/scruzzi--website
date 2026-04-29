@@ -8,20 +8,23 @@ if command -v ufw >/dev/null 2>&1; then
   sudo ufw allow 8085/tcp || echo "Port 8085 bereits freigegeben"
 fi
 
-# Prüfen ob docker-compose oder docker compose vorhanden ist
-if command -v docker-compose >/dev/null 2>&1; then
-  DOCKER_COMPOSE="docker-compose"
-elif docker compose version >/dev/null 2>&1; then
+# Prüfen ob Docker Compose vorhanden und wirklich nutzbar ist
+if docker compose version >/dev/null 2>&1; then
   DOCKER_COMPOSE="docker compose"
+elif command -v docker-compose >/dev/null 2>&1 && docker-compose version >/dev/null 2>&1; then
+  DOCKER_COMPOSE="docker-compose"
 else
   echo "Docker Compose nicht gefunden!"
+  echo "Falls du Docker Desktop nutzt, aktiviere die WSL-Integration für diese Distribution."
   exit 1
 fi
 
 # Deployment mit Docker Compose
-echo "Führe $DOCKER_COMPOSE up -d --build aus..."
-$DOCKER_COMPOSE build --no-cache
-$DOCKER_COMPOSE up -d --build --force-recreate
+echo "Ziehe aktuelles GitHub Container Registry Image..."
+$DOCKER_COMPOSE pull
+
+echo "Starte Container..."
+$DOCKER_COMPOSE up -d --force-recreate
 
 # Cross-platform check for IP address
 if command -v ipconfig >/dev/null 2>&1; then

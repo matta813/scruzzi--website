@@ -15,3 +15,7 @@ Einfach das mitgelieferte Skript ausführen (erfordert Docker & Docker Compose):
 ```
 Das Skript zieht das aktuelle Image aus der GitHub Container Registry und startet es lokal.
 Der Server ist dann standardmäßig unter Port **8085** erreichbar: `http://localhost:8085`.
+
+## Versionierung
+Jeder Push erzeugt automatisch ein GitHub Release im Format `vYYYY.MM.DD.<run-number>` und veröffentlicht ein passend getaggtes Docker Image.
+Der `latest`-Tag wird nur bei Pushes auf `main` aktualisiert.

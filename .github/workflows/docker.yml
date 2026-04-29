@@ -2,7 +2,6 @@ name: Lint & Build Docker Image
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -24,6 +23,9 @@ jobs:
   build-and-push:
     needs: lint
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      image: ${{ steps.meta.outputs.versioned_image }}
     permissions:
       contents: read
       packages: write
@@ -46,9 +48,18 @@ jobs:
         id: meta
         run: |
           IMAGE_NAME="ghcr.io/${GITHUB_REPOSITORY,,}/nice-bauch"
+          VERSION="v$(date -u +'%Y.%m.%d').${GITHUB_RUN_NUMBER}"
+          TAGS="${IMAGE_NAME}:${GITHUB_SHA},${IMAGE_NAME}:${VERSION}"
+
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            TAGS="${IMAGE_NAME}:latest,${TAGS}"
+          fi
+
           {
             echo "image=${IMAGE_NAME}"
-            echo "tags=${IMAGE_NAME}:latest,${IMAGE_NAME}:${GITHUB_SHA}"
+            echo "version=${VERSION}"
+            echo "versioned_image=${IMAGE_NAME}:${VERSION}"
+            echo "tags=${TAGS}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and Push Docker Image
@@ -59,3 +70,25 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  release:
+    needs: build-and-push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.build-and-push.outputs.version }}
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+        run: |
+          gh release create "${VERSION}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "Release ${VERSION}" \
+            --notes "Automatisches Release für Branch ${GITHUB_REF_NAME} und Commit ${GITHUB_SHA}.
+
+          Docker Image:
+          ${IMAGE}"

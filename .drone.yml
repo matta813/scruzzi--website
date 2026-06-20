@@ -20,6 +20,8 @@ steps:
         git config user.email "drone@scruzzi.com"
         git config user.name "Drone CI"
         
+        git remote set-url origin "gitea@192.168.0.45:${DRONE_REPO_OWNER}/${DRONE_REPO_NAME}.git"
+        
         LATEST_TAG=$(git tag --sort=-v:refname | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || echo "")
         
         if [ -z "$LATEST_TAG" ]; then

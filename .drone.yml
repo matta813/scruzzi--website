@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: kubernetes
-name: release
+name: build-and-push
 
 trigger:
   event:
@@ -9,11 +9,17 @@ trigger:
   ref:
     include:
       - refs/heads/main
+      - refs/tags/v*
 
 steps:
-  - name: release
-    image: alpine
-    commands:
-      - echo "PLUGIN_TOKEN=$PLUGIN_TOKEN"
-      - echo "ENV TOKEN=$GITEA_TOKEN"
-      - env | grep -i token || true
+  - name: build-and-push
+    image: plugins/docker
+    settings:
+      dockerfile: Dockerfile
+      registry: git.scruzzi.com
+      repo: git.scruzzi.com/mattia/scruzzi-website
+      auto_tag: true
+      username:
+        from_secret: gitea_registry_user
+      password:
+        from_secret: gitea_registry_password

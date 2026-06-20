@@ -13,48 +13,7 @@ trigger:
 steps:
   - name: release
     image: alpine
-    secrets:
-      - gitea_token
     commands:
-      - apk add --no-cache git curl
-      - |
-        set -eu
-        
-        if [ -z "$GITEA_TOKEN" ]; then
-          echo "ERROR: GITEA_TOKEN is empty"
-          exit 1
-        fi
-        
-        LATEST_TAG=$(git tag --sort=-v:refname | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || echo "")
-        
-        if [ -z "$LATEST_TAG" ]; then
-          NEXT_VERSION="v1.0.0"
-        else
-          VERSION="${LATEST_TAG#v}"
-          MAJOR=$(echo "$VERSION" | cut -d. -f1)
-          MINOR=$(echo "$VERSION" | cut -d. -f2)
-          PATCH=$(echo "$VERSION" | cut -d. -f3)
-          PATCH=$((PATCH + 1))
-          NEXT_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
-        fi
-        
-        echo "Creating tag: $NEXT_VERSION"
-        COMMIT_SHA=$(git rev-parse HEAD)
-        
-        curl -s -X POST \
-          -H "Authorization: token ${GITEA_TOKEN}" \
-          -H "Content-Type: application/json" \
-          "https://git.scruzzi.com/api/v1/repos/${DRONE_REPO_OWNER}/${DRONE_REPO_NAME}/git/refs" \
-          -d "{\"ref\":\"refs/tags/${NEXT_VERSION}\",\"sha\":\"${COMMIT_SHA}\"}"
-
-  - name: build-and-push
-    image: plugins/docker
-    settings:
-      dockerfile: Dockerfile
-      registry: git.scruzzi.com
-      repo: git.scruzzi.com/mattia/scruzzi-website
-      auto_tag: true
-      username:
-        from_secret: gitea_registry_user
-      password:
-        from_secret: gitea_registry_password
+      - echo "PLUGIN_TOKEN=$PLUGIN_TOKEN"
+      - echo "ENV TOKEN=$GITEA_TOKEN"
+      - env | grep -i token || true

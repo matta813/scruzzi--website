@@ -13,13 +13,17 @@ trigger:
 steps:
   - name: release
     image: alpine
-    environment:
-      GITEA_TOKEN:
-        from_secret: gitea_token
+    secrets:
+      - gitea_token
     commands:
       - apk add --no-cache git curl
       - |
         set -eu
+        
+        if [ -z "$GITEA_TOKEN" ]; then
+          echo "ERROR: GITEA_TOKEN is empty"
+          exit 1
+        fi
         
         LATEST_TAG=$(git tag --sort=-v:refname | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || echo "")
         

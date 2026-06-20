@@ -13,14 +13,13 @@ trigger:
 steps:
   - name: release
     image: alpine
+    environment:
+      GITEA_TOKEN:
+        from_secret: gitea_token
     commands:
-      - apk add --no-cache git openssh-client
+      - apk add --no-cache git curl
       - |
         set -eu
-        git config user.email "drone@scruzzi.com"
-        git config user.name "Drone CI"
-        
-        git remote set-url origin "gitea@192.168.0.45:${DRONE_REPO_OWNER}/${DRONE_REPO_NAME}.git"
         
         LATEST_TAG=$(git tag --sort=-v:refname | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || echo "")
         
@@ -36,8 +35,13 @@ steps:
         fi
         
         echo "Creating tag: $NEXT_VERSION"
-        git tag "$NEXT_VERSION"
-        GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git push origin "$NEXT_VERSION"
+        COMMIT_SHA=$(git rev-parse HEAD)
+        
+        curl -s -X POST \
+          -H "Authorization: token ${GITEA_TOKEN}" \
+          -H "Content-Type: application/json" \
+          "https://git.scruzzi.com/api/v1/repos/${DRONE_REPO_OWNER}/${DRONE_REPO_NAME}/git/refs" \
+          -d "{\"ref\":\"refs/tags/${NEXT_VERSION}\",\"sha\":\"${COMMIT_SHA}\"}"
 
   - name: build-and-push
     image: plugins/docker

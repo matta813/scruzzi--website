@@ -31,9 +31,9 @@ Der komplette Flow läuft automatisch bei jedem Push auf `main`
 Commit (Conventional Commits)
   → semantic-release: SemVer-Bump, CHANGELOG.md, Git-Tag vX.Y.Z, GitLab-Release
   → Kaniko: Image-Build & Push  (:X.Y.Z, :sha-<commit>, :latest)
-  → GitOps-Update: Versions-Tag in apps-flux/scruzzi/scruzzi.yaml gepinnt
+  → Renovate (stündlich): erkennt den neuen Tag, MR im GitOps-Repo,
+    Patch-Updates automerged
   → FluxCD rollt die neue Version im Cluster aus
-  → Renovate trackt den Image-Pfad und erstellt MRs für neue Tags
 ```
 
 - **Versionierung:** `fix:` → Patch, `feat:` → Minor,

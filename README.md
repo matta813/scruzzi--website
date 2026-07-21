@@ -1,24 +1,31 @@
-# nice-bauch
+# scruzzi-website
 
-Ein minimalistisches Single-Page-Setup mit modernem Design und serverseitiger Geräte-Speicherung.
+Persönliche Portfolio-Website – Plattformentwickler in Ausbildung.
+Statisches HTML/CSS/JS, ausgeliefert von einem minimalen Python-Server
+(stdlib only, kein Framework, kein Build-Step).
 
-## Features
-- **Modernes Design**: Glassmorphism-Stil mit Space Grotesk Font.
-- **Ready-to-run**: Inklusive Bash-Skript für den schnellen Start.
-- **Sicher & Leicht**: Läuft als unprivilegierter Python-Container auf Alpine-Basis.
-- **Interaktiv**: Speichert das Nice-Level pro Gerät serverseitig in SQLite.
-- **Ohne Login**: Jedes Gerät bekommt automatisch eine zufällige Browser-ID.
+## Struktur
 
-## Starten
-Einfach das mitgelieferte Skript ausführen (erfordert Docker & Docker Compose):
-```bash
-./run-nice-bauch.sh
+| Datei         | Zweck                                             |
+| ------------- | ------------------------------------------------- |
+| `index.html`  | Die gesamte Seite (One-Pager)                     |
+| `style.css`   | Design (Dark Mode als Standard, Light-Toggle)     |
+| `theme.js`    | Blocking Theme-Init (kein Farb-Flackern)          |
+| `main.js`     | Theme-Toggle + Scroll-Reveal                      |
+| `server.py`   | Statischer Fileserver auf `:8080` mit `/health`   |
+
+## Lokal ausführen
+
+```sh
+docker build -t scruzzi-website .
+docker run --rm -p 8085:8080 scruzzi-website
+# → http://localhost:8085
 ```
-Das Skript zieht das aktuelle Image aus der GitHub Container Registry und startet es lokal.
-Der Server ist dann standardmäßig unter Port **8085** erreichbar: `http://localhost:8085`.
 
-Die SQLite-Datenbank liegt im Docker-Volume `nice-bauch-data` und bleibt bei Container-Neustarts erhalten.
+## Deployment
 
-## Versionierung
-Jeder Push erzeugt automatisch ein GitHub Release im Format `vYYYY.MM.DD.<run-number>` und veröffentlicht ein passend getaggtes Docker Image.
-Der `latest`-Tag wird nur bei Pushes auf `main` aktualisiert.
+- **CI:** GitLab CI baut das Image mit Kaniko und pusht `latest` +
+  Commit-SHA in die Registry (siehe `.gitlab-ci.yml`).
+- **Runtime:** Container lauscht auf Port **8080**, Health-Endpoint
+  unter `GET /health` (`{"status": "ok"}`) – kompatibel mit dem
+  bestehenden Kubernetes-Deployment.

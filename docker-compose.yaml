@@ -1,7 +1,7 @@
 services:
-  nice-bauch:
+  scruzzi-website:
     image: ghcr.io/scruzzimattia-blip/scruzzi-website/nice-bauch:latest
-    container_name: nice-bauch
+    container_name: scruzzi-website
     restart: unless-stopped
     ports:
       - "8085:8080"
@@ -15,19 +15,8 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-    volumes:
-      - nice-bauch-data:/data
     deploy:
       resources:
         limits:
           cpus: '0.20'
           memory: 128M
-    networks:
-      - nice-bauch-net
-
-networks:
-  nice-bauch-net:
-    driver: bridge
-
-volumes:
-  nice-bauch-data:

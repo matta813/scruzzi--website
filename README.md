@@ -22,10 +22,23 @@ docker run --rm -p 8085:8080 scruzzi-website
 # → http://localhost:8085
 ```
 
-## Deployment
+## Release & Deployment
 
-- **CI:** GitLab CI baut das Image mit Kaniko und pusht `latest` +
-  Commit-SHA in die Registry (siehe `.gitlab-ci.yml`).
+Der komplette Flow läuft automatisch bei jedem Push auf `main`
+(Details und benötigte CI-Variablen: Kommentar-Block in `.gitlab-ci.yml`):
+
+```
+Commit (Conventional Commits)
+  → semantic-release: SemVer-Bump, CHANGELOG.md, Git-Tag vX.Y.Z, GitLab-Release
+  → Kaniko: Image-Build & Push  (:X.Y.Z, :sha-<commit>, :latest)
+  → GitOps-Update: Versions-Tag in apps-flux/scruzzi/scruzzi.yaml gepinnt
+  → FluxCD rollt die neue Version im Cluster aus
+  → Renovate trackt den Image-Pfad und erstellt MRs für neue Tags
+```
+
+- **Versionierung:** `fix:` → Patch, `feat:` → Minor,
+  `BREAKING CHANGE:` → Major. Commits wie `chore:`/`docs:`/`ci:` lösen
+  kein Release (und damit keinen Build) aus.
 - **Runtime:** Container lauscht auf Port **8080**, Health-Endpoint
   unter `GET /health` (`{"status": "ok"}`) – kompatibel mit dem
   bestehenden Kubernetes-Deployment.

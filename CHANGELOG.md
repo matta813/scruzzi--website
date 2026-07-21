@@ -1,3 +1,9 @@
+## [1.0.1](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.0.0...v1.0.1) (2026-07-21)
+
+### Bug Fixes
+
+* year in Ausbldung segment ([1134121](https://gitlab.scruzzi.com/root/scruzzi-website/commit/1134121be9a9b31562c660800c837a46d75edd91))
+
 ## 1.0.0 (2026-07-21)
 
 ### Features

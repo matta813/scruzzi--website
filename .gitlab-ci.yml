@@ -95,7 +95,7 @@ update-gitops:
     - git config user.email "ci@scruzzi.com"
     - sed -i -E "s|(image:[[:space:]]+${CI_REGISTRY}/root/scruzzi-website):.*|\1:${RELEASE_VERSION}|" apps-flux/scruzzi/scruzzi.yaml
     - grep -q "scruzzi-website:${RELEASE_VERSION}" apps-flux/scruzzi/scruzzi.yaml || { echo "Image-Zeile wurde nicht ersetzt!"; exit 1; }
-    - git commit -am "chore(scruzzi): bump scruzzi-website to ${RELEASE_VERSION}"
+    - 'git commit -am "chore(scruzzi): bump scruzzi-website to ${RELEASE_VERSION}"'
     # Retry gegen Races mit parallelen Renovate-/CI-Pushes
     - |
       for i in 1 2 3; do

@@ -1,3 +1,9 @@
+## [1.0.2](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.0.1...v1.0.2) (2026-07-21)
+
+### Bug Fixes
+
+* year in live segment on top of the page to 3rd not 1st ([a1b93a5](https://gitlab.scruzzi.com/root/scruzzi-website/commit/a1b93a5506c6b1154177176fc817d9e5bc489750))
+
 ## [1.0.1](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.0.0...v1.0.1) (2026-07-21)
 
 ### Bug Fixes

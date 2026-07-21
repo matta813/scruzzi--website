@@ -1,6 +1,6 @@
 services:
   scruzzi-website:
-    image: ghcr.io/scruzzimattia-blip/scruzzi-website/nice-bauch:latest
+    image: registry.scruzzi.com/root/scruzzi-website:latest
     container_name: scruzzi-website
     restart: unless-stopped
     ports:

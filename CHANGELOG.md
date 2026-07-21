@@ -1,0 +1,23 @@
+## 1.0.0 (2026-07-21)
+
+### Features
+
+* add interactive 'Bauch-Meter' with animations and local storage ([c04d8a4](https://gitlab.scruzzi.com/root/scruzzi-website/commit/c04d8a4cade604cc1409e3f029041d514009dc63))
+* add landing page, startup script and documentation ([1d06c1b](https://gitlab.scruzzi.com/root/scruzzi-website/commit/1d06c1bbd6a1795aa205dbddb966604e60394006))
+* add much more variety to quotes ([df4eb95](https://gitlab.scruzzi.com/root/scruzzi-website/commit/df4eb95551655e1790d222f3023d142eaf2107aa))
+* add secure and optimized nginx configuration ([53bf949](https://gitlab.scruzzi.com/root/scruzzi-website/commit/53bf949284dde050c8855f9c854ffb230646d026))
+* add tracking script for enhanced analytics and user engagement ([979d45b](https://gitlab.scruzzi.com/root/scruzzi-website/commit/979d45b516d3c7cc8a1d527dae3ae7164d5a63ca))
+* **ci:** automatic semver releases with GitOps image bump ([4406459](https://gitlab.scruzzi.com/root/scruzzi-website/commit/4406459f96db03ae745c4d38e3944a3497b59c2f))
+* enhance user interface with new score tracking system, improved styling, and interactive elements ([0763ed3](https://gitlab.scruzzi.com/root/scruzzi-website/commit/0763ed3f96a951107997e26406e76e25d089ac0e))
+* migrate to Python-based server, implement server-side device storage, and enhance health check mechanism ([ed991b0](https://gitlab.scruzzi.com/root/scruzzi-website/commit/ed991b07bb380192a793b2d2c064a3c3d8847275))
+* modernize UX with confetti, improve security with unprivileged nginx, and sync registry settings ([f89fe27](https://gitlab.scruzzi.com/root/scruzzi-website/commit/f89fe277a543cfb5f1ee5507c1e8942637cb7614))
+* update Content-Security-Policy to include tracking domain for improved analytics ([3253b2f](https://gitlab.scruzzi.com/root/scruzzi-website/commit/3253b2f6b8680bd3f4d27229712e4d08d56051a5))
+
+### Bug Fixes
+
+* add build context to docker-compose.yaml to allow local builds ([2414607](https://gitlab.scruzzi.com/root/scruzzi-website/commit/24146079168ec00688a9737fb3d1e8b72460d5ad))
+* change lint job to run on ubuntu-latest instead of self-hosted ([e781923](https://gitlab.scruzzi.com/root/scruzzi-website/commit/e7819239b220d6c2209ffef2ed3944a9a6c6da4f))
+* force build without cache and add cache busting for css/js ([08d91f5](https://gitlab.scruzzi.com/root/scruzzi-website/commit/08d91f5fb9888c83526c239307a60db4850b01c2))
+* macOS compatibility in bash script and native docker compose build ([8ad9b61](https://gitlab.scruzzi.com/root/scruzzi-website/commit/8ad9b61f4267a7bb00cac99f43140ef048ba19c9))
+* simplify docker image names to avoid 'name invalid' errors ([b245b68](https://gitlab.scruzzi.com/root/scruzzi-website/commit/b245b68d60c94a13a945f2a063c200af3968c6cd))
+* use native docker commands to avoid GitHub action clone issues ([a9f8b6b](https://gitlab.scruzzi.com/root/scruzzi-website/commit/a9f8b6b2d14a89b722877aba1b795a1feed3abdd))

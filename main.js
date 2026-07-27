@@ -3,12 +3,15 @@
 // --- Theme toggle -----------------------------------------------------------
 const toggle = document.getElementById("theme-toggle");
 
+toggle.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "light"));
+
 toggle.addEventListener("click", () => {
   const root = document.documentElement;
   const next = root.dataset.theme === "dark" ? "light" : "dark";
 
   document.body.classList.add("theme-switching");
   root.dataset.theme = next;
+  toggle.setAttribute("aria-pressed", String(next === "light"));
   requestAnimationFrame(() => {
     requestAnimationFrame(() => document.body.classList.remove("theme-switching"));
   });

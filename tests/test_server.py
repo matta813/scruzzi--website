@@ -123,3 +123,39 @@ def test_txt_file_served_with_cache_policy(running_server):
     resp = conn.getresponse()
     assert resp.status == 200
     assert resp.getheader("Cache-Control") == "public, max-age=86400"
+
+
+@pytest.mark.parametrize(
+    "header,expected_substring",
+    [
+        ("X-Frame-Options", "SAMEORIGIN"),
+        ("X-Content-Type-Options", "nosniff"),
+        ("Referrer-Policy", "strict-origin-when-cross-origin"),
+        ("Permissions-Policy", "geolocation=()"),
+        ("Strict-Transport-Security", "max-age="),
+        ("Content-Security-Policy", "default-src 'self'"),
+    ],
+)
+def test_security_headers_present_on_static_response(running_server, header, expected_substring):
+    host, port = running_server
+    conn = http.client.HTTPConnection(host, port)
+    conn.request("GET", "/")
+    resp = conn.getresponse()
+    resp.read()
+    assert expected_substring in (resp.getheader(header) or "")
+
+
+@pytest.mark.parametrize(
+    "header,expected_substring",
+    [
+        ("X-Frame-Options", "SAMEORIGIN"),
+        ("Content-Security-Policy", "default-src 'self'"),
+    ],
+)
+def test_security_headers_present_on_json_response(running_server, header, expected_substring):
+    host, port = running_server
+    conn = http.client.HTTPConnection(host, port)
+    conn.request("GET", "/health")
+    resp = conn.getresponse()
+    resp.read()
+    assert expected_substring in (resp.getheader(header) or "")

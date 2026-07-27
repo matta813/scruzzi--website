@@ -8,6 +8,11 @@
 # Reuses the GITLAB_TOKEN CI/CD variable already configured for
 # semantic-release (scopes: api, write_repository are sufficient for
 # Renovate to open MRs too).
+#
+# Local to this repo only — channieinifigge-website has its own copy in
+# its .gitlab-ci.yml rather than cross-project-including this file: its
+# scheduled pipeline runs as that repo's own bot user, which has no
+# access to this project, so the include would fail to resolve.
 
 self-renovate:
   stage: renovate

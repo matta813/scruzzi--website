@@ -22,9 +22,10 @@
 #                das nur apps-flux/*.yaml-Image-Tags beobachtet und nie
 #                in dieses Repo hineinschaut.
 #
-# release + build-and-push + self-renovate kommen aus den gemeinsamen
-# Templates unter .gitlab/ci-templates/ (auch von channieinifigge-website
-# per `include: project:` genutzt).
+# release + build-and-push kommen aus .gitlab/ci-templates/release-and-build.yml
+# (auch von channieinifigge-website per `include: project:` genutzt).
+# self-renovate.yml ist nur lokal hier eingebunden — channi hat eine
+# eigene Kopie, da sein Schedule-Bot keinen Zugriff auf dieses Repo hat.
 #
 # Ausrollen: Renovate (läuft stündlich im Cluster) erkennt den neuen
 # Registry-Tag und erstellt im GitOps-Repo einen MR, der den Versions-Tag

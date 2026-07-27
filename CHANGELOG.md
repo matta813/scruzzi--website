@@ -1,3 +1,9 @@
+## [1.2.1](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.2.0...v1.2.1) (2026-07-27)
+
+### Bug Fixes
+
+* chown copied files to the app user in Dockerfile ([e4d299a](https://gitlab.scruzzi.com/root/scruzzi-website/commit/e4d299a925580bc57e91670c2dc3b367fd497d28))
+
 ## [1.2.0](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.1.0...v1.2.0) (2026-07-27)
 
 ### Features

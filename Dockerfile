@@ -11,11 +11,14 @@ RUN addgroup -S app && adduser -S -G app app \
 
 COPY --chown=app:app server.py /app/server.py
 COPY --chown=app:app index.html /app/public/index.html
+COPY --chown=app:app 404.html /app/public/404.html
 COPY --chown=app:app style.css /app/public/style.css
 COPY --chown=app:app main.js /app/public/main.js
 COPY --chown=app:app theme.js /app/public/theme.js
 COPY --chown=app:app favicon.svg /app/public/favicon.svg
 COPY --chown=app:app robots.txt /app/public/robots.txt
+COPY --chown=app:app sitemap.xml /app/public/sitemap.xml
+COPY --chown=app:app social-preview.png /app/public/social-preview.png
 
 USER app
 

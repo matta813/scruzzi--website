@@ -199,11 +199,12 @@ a {
   color: var(--accent);
 }
 
-.theme-toggle {
+.theme-toggle,
+.menu-toggle {
   display: grid;
   place-items: center;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-s);
   background: var(--bg-raised);
@@ -212,9 +213,15 @@ a {
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 
-.theme-toggle:hover {
+.theme-toggle:hover,
+.menu-toggle:hover {
   color: var(--accent);
   border-color: var(--accent-border);
+}
+
+.menu-toggle {
+  display: none;
+  margin-left: auto;
 }
 
 :root[data-theme="dark"] .icon-moon { display: none; }
@@ -644,15 +651,49 @@ a {
 }
 
 /* ==========================================================================
+   Error page
+   ========================================================================== */
+.error-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.error-card {
+  width: min(100%, 38rem);
+  padding: clamp(2rem, 7vw, 4rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.error-card h1 {
+  margin-bottom: 1rem;
+  font-size: clamp(2rem, 8vw, 3.5rem);
+}
+
+.error-card > p:not(.section-eyebrow) {
+  margin-bottom: 2rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
    Scroll-Reveal
    ========================================================================== */
-.reveal {
+.js .reveal {
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
 }
 
-.reveal.is-visible {
+.js .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
@@ -688,12 +729,51 @@ a {
 }
 
 @media (max-width: 560px) {
-  .nav-links {
-    display: none;
+  .js .menu-toggle {
+    display: grid;
   }
 
-  .nav-brand {
+  .nav-brand,
+  .no-js .nav-links {
     margin-right: auto;
+  }
+
+  .js .nav {
+    position: relative;
+  }
+
+  .js .nav-links {
+    position: absolute;
+    top: calc(100% + 1px);
+    left: 1rem;
+    right: 1rem;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    box-shadow: var(--shadow-card);
+  }
+
+  .js .menu-toggle[aria-expanded="true"] + .nav-links {
+    display: flex;
+  }
+
+  .js .nav-links a {
+    display: block;
+    padding: 0.75rem;
+  }
+
+  .no-js .nav {
+    flex-wrap: wrap;
+  }
+
+  .no-js .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
@@ -712,7 +792,7 @@ a {
     transition: none !important;
   }
 
-  .reveal {
+  .js .reveal {
     opacity: 1;
     transform: none;
   }

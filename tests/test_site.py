@@ -1,0 +1,78 @@
+import base64
+import hashlib
+import inspect
+import json
+import re
+from html.parser import HTMLParser
+from pathlib import Path
+from xml.etree import ElementTree
+
+import server
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+class SiteParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.ids = []
+        self.fragment_links = []
+        self.local_assets = []
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if element_id := attributes.get("id"):
+            self.ids.append(element_id)
+        if (href := attributes.get("href", "")).startswith("#"):
+            self.fragment_links.append(href[1:])
+        for attribute in ("href", "src", "content"):
+            value = attributes.get(attribute, "")
+            if value != "/" and value.startswith("/") and not value.startswith("//"):
+                self.local_assets.append(value.removeprefix("/"))
+
+
+def parse_site(filename="index.html"):
+    parser = SiteParser()
+    parser.feed((ROOT / filename).read_text(encoding="utf-8"))
+    return parser
+
+
+def test_document_ids_are_unique_and_fragment_links_resolve():
+    parser = parse_site()
+    assert len(parser.ids) == len(set(parser.ids))
+    assert set(parser.fragment_links) <= set(parser.ids)
+
+
+def test_all_local_assets_are_packaged():
+    assets = set(parse_site().local_assets) | set(parse_site("404.html").local_assets)
+    assert assets
+    assert not {asset for asset in assets if not (ROOT / asset).is_file()}
+
+
+def test_structured_data_is_valid_json_and_allowed_by_csp():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    match = re.search(r'<script type="application/ld\+json">\n(.*?)</script>', html, re.DOTALL)
+    assert match
+    payload = match.group(1)
+    assert json.loads(payload)["@type"] == "Person"
+
+    digest = base64.b64encode(hashlib.sha256(payload.encode()).digest()).decode()
+    assert f"'sha256-{digest}'" in inspect.getsource(server.PortfolioHandler.send_common_headers)
+
+
+def test_social_metadata_and_crawler_files_are_present():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'property="og:image"' in html
+    assert 'name="twitter:card" content="summary_large_image"' in html
+    assert (ROOT / "social-preview.png").is_file()
+    assert "Sitemap: https://scruzzi.com/sitemap.xml" in (ROOT / "robots.txt").read_text()
+    root = ElementTree.parse(ROOT / "sitemap.xml").getroot()
+    assert root.tag.endswith("urlset")
+
+
+def test_reveal_animation_is_progressive_enhancement():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    css = (ROOT / "style.css").read_text(encoding="utf-8")
+    assert 'class="no-js"' in html
+    assert ".js .reveal" in css
+    assert "\n.reveal {" not in css

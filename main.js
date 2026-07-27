@@ -2,8 +2,21 @@
 
 // --- Theme toggle -----------------------------------------------------------
 const toggle = document.getElementById("theme-toggle");
+const menuToggle = document.getElementById("menu-toggle");
+const navLinks = document.getElementById("nav-links");
 
-toggle.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "light"));
+function updateThemeControl(theme) {
+  const lightActive = theme === "light";
+  toggle.setAttribute("aria-pressed", String(lightActive));
+  toggle.setAttribute("aria-label", lightActive ? "Dunkles Design aktivieren" : "Helles Design aktivieren");
+}
+
+function closeMenu() {
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "Navigation öffnen");
+}
+
+updateThemeControl(document.documentElement.dataset.theme);
 
 toggle.addEventListener("click", () => {
   const root = document.documentElement;
@@ -11,7 +24,7 @@ toggle.addEventListener("click", () => {
 
   document.body.classList.add("theme-switching");
   root.dataset.theme = next;
-  toggle.setAttribute("aria-pressed", String(next === "light"));
+  updateThemeControl(next);
   requestAnimationFrame(() => {
     requestAnimationFrame(() => document.body.classList.remove("theme-switching"));
   });
@@ -21,6 +34,20 @@ toggle.addEventListener("click", () => {
   } catch (e) {
     /* private mode etc. — theme still switches for this visit */
   }
+});
+
+menuToggle.addEventListener("click", () => {
+  const expanded = menuToggle.getAttribute("aria-expanded") === "true";
+  menuToggle.setAttribute("aria-expanded", String(!expanded));
+  menuToggle.setAttribute("aria-label", expanded ? "Navigation öffnen" : "Navigation schließen");
+});
+
+navLinks.addEventListener("click", (event) => {
+  if (event.target.closest("a")) closeMenu();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeMenu();
 });
 
 // --- Scroll reveal ----------------------------------------------------------

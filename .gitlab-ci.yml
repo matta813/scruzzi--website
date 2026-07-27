@@ -41,12 +41,12 @@ release:
     - apk add --no-cache git
   script:
     - npx --yes
-      -p semantic-release@24
-      -p @semantic-release/changelog@6
-      -p @semantic-release/exec@7
-      -p @semantic-release/git@10
-      -p @semantic-release/gitlab@13
-      -p conventional-changelog-conventionalcommits@8
+      -p semantic-release@24.2.9
+      -p @semantic-release/changelog@6.0.3
+      -p @semantic-release/exec@7.1.0
+      -p @semantic-release/git@10.0.1
+      -p @semantic-release/gitlab@13.3.3
+      -p conventional-changelog-conventionalcommits@8.0.0
       semantic-release
     # Ohne neue Version bleibt release.env leer → build/deploy überspringen sich selbst
     - test -f release.env || echo "RELEASE_VERSION=" > release.env

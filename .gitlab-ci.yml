@@ -1,13 +1,15 @@
-# CI/CD-Flow (Commit → Version-Bump → Image-Build → Renovate → GitOps):
+# CI/CD-Flow (Commit → Lint/Test/SAST → Version-Bump → Image-Build → Renovate → GitOps):
 #
-#   1. release   semantic-release analysiert die Conventional Commits auf
+#   1. test      Lint (ruff) und Unit-Tests (pytest) für server.py, plus
+#                GitLab SAST auf den Python-Code.
+#   2. release   semantic-release analysiert die Conventional Commits auf
 #                main (feat: → minor, fix: → patch, BREAKING CHANGE →
 #                major), bestimmt die nächste SemVer-Version, schreibt
 #                CHANGELOG.md zurück ins Repo ([skip ci]), setzt den
 #                Git-Tag vX.Y.Z und erstellt ein GitLab-Release.
 #                Gibt es keine release-würdigen Commits (nur chore/docs/
 #                ci/…), endet die Pipeline hier ohne Build.
-#   2. build     Kaniko baut das Image und pusht es in die Registry als
+#   3. build     Kaniko baut das Image und pusht es in die Registry als
 #                :X.Y.Z (Deployment-Tag), :sha-<commit> (Nachvollzieh-
 #                barkeit) und :latest (nur für docker-compose/Fallback —
 #                das Cluster-Deployment nutzt den Versions-Tag).
@@ -23,7 +25,11 @@
 #                 write_repository) — für semantic-release (Tag, Release,
 #                 CHANGELOG-Commit).
 
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
 stages:
+  - test
   - release
   - build
 
@@ -33,6 +39,20 @@ workflow:
     - if: '$CI_COMMIT_TAG'
       when: never
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+lint:
+  stage: test
+  image: python:3.13-alpine
+  script:
+    - pip install --quiet ruff
+    - ruff check server.py tests/
+
+test:
+  stage: test
+  image: python:3.13-alpine
+  script:
+    - pip install --quiet pytest
+    - python -m pytest tests/ -v
 
 release:
   stage: release

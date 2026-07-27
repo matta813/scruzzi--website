@@ -28,6 +28,7 @@ CACHE_POLICIES = {
 
 class PortfolioHandler(BaseHTTPRequestHandler):
     server_version = "scruzzi-web/2.0"
+    protocol_version = "HTTP/1.1"
 
     def do_GET(self):
         if urlparse(self.path).path == "/health":
@@ -36,8 +37,11 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         self.serve_static()
 
     def do_HEAD(self):
-        self.head_only = True
         self.do_GET()
+
+    @property
+    def head_only(self):
+        return self.command == "HEAD"
 
     def serve_static(self):
         request_path = unquote(urlparse(self.path).path).lstrip("/")
@@ -58,7 +62,7 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", cache_control)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        if not getattr(self, "head_only", False):
+        if not self.head_only:
             self.wfile.write(body)
 
     def respond_json(self, payload, status=HTTPStatus.OK):
@@ -69,7 +73,7 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        if not getattr(self, "head_only", False):
+        if not self.head_only:
             self.wfile.write(body)
 
     def respond_error(self, status, message):
@@ -79,6 +83,9 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         self.send_header("X-Frame-Options", "SAMEORIGIN")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        # Browsers only honor this over HTTPS, so it's a no-op on plain HTTP — safe to always send.
+        self.send_header("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
         self.send_header(
             "Content-Security-Policy",
             "default-src 'self'; "

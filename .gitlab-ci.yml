@@ -57,7 +57,7 @@ workflow:
 
 lint:
   stage: test
-  image: python:3.13-alpine
+  image: python:3.14-alpine
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
@@ -68,7 +68,7 @@ lint:
 
 test:
   stage: test
-  image: python:3.13-alpine
+  image: python:3.14-alpine
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never

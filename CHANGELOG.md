@@ -1,3 +1,13 @@
+## [1.1.0](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.0.2...v1.1.0) (2026-07-27)
+
+### Features
+
+* add social preview meta tags and theme-color ([aa98039](https://gitlab.scruzzi.com/root/scruzzi-website/commit/aa9803936917437805f387b3256a7efabbea052e))
+
+### Bug Fixes
+
+* correct HEAD handling on keep-alive connections and harden headers ([8814768](https://gitlab.scruzzi.com/root/scruzzi-website/commit/881476888d6d2913deec15fb040208bfd8a004a8))
+
 ## [1.0.2](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.0.1...v1.0.2) (2026-07-21)
 
 ### Bug Fixes

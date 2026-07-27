@@ -1,0 +1,7 @@
+.git
+.gitlab-ci.yml
+.releaserc.json
+CHANGELOG.md
+README.md
+docker-compose.yaml
+node_modules

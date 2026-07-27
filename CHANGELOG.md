@@ -1,3 +1,14 @@
+## [1.2.0](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.1.0...v1.2.0) (2026-07-27)
+
+### Features
+
+* add gzip compression, ETag caching and favicon/robots serving ([c36a895](https://gitlab.scruzzi.com/root/scruzzi-website/commit/c36a89502d90a62acd824ec99f3f853c80bd5bd9))
+* add SEO metadata, structured data and theme-toggle aria state ([2c0011a](https://gitlab.scruzzi.com/root/scruzzi-website/commit/2c0011a5e31c2ee804cc74d478e8e3d678c2c901))
+
+### Bug Fixes
+
+* mark server.py executable to satisfy ruff EXE001 ([6385a0b](https://gitlab.scruzzi.com/root/scruzzi-website/commit/6385a0ba0994f1203c83920dff6cf11916ee2cb8))
+
 ## [1.1.0](https://gitlab.scruzzi.com/root/scruzzi-website/compare/v1.0.2...v1.1.0) (2026-07-27)
 
 ### Features

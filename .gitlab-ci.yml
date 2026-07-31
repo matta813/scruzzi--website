@@ -66,7 +66,7 @@ lint:
       when: never
     - when: on_success
   script:
-    - pip install --quiet ruff==0.16.0
+    - pip install --quiet ruff==0.16.1
     - ruff check server.py tests/
 
 test:

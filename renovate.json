@@ -4,13 +4,13 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^\\.gitlab-ci\\.yml$/", "/^\\.gitlab/ci-templates/.+\\.yml$/"],
+      "managerFilePatterns": ["/^\\.github/workflows/.+\\.yml$/"],
       "matchStrings": ["-p (?<depName>[^@\\s]+)@(?<currentValue>[\\d.]+)\\b"],
       "datasourceTemplate": "npm"
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^\\.gitlab-ci\\.yml$/"],
+      "managerFilePatterns": ["/^\\.github/workflows/.+\\.yml$/"],
       "matchStrings": ["pip install --quiet (?<depName>[a-zA-Z0-9_-]+)==(?<currentValue>[\\d.]+)"],
       "datasourceTemplate": "pypi"
     }

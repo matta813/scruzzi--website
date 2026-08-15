@@ -1,6 +1,6 @@
 services:
   scruzzi-website:
-    image: registry.scruzzi.com/root/scruzzi-website:latest
+    image: ghcr.io/matta813/scruzzi--website:latest
     container_name: scruzzi-website
     restart: unless-stopped
     ports:

@@ -10,31 +10,44 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   lint-and-test:
-    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.14"
-      - run: pip install ruff==0.16.3 pytest==9.1.1
+      - run: pip install --requirement requirements-dev.txt
       - run: ruff check server.py tests/
       - run: python -m pytest tests/ -v
-      - uses: actions/setup-node@v7
+      - name: Build and smoke-test container
+        run: |
+          docker build --tag scruzzi-website:test .
+          container_id=$(docker run --detach --read-only --cap-drop ALL --tmpfs /tmp --publish 127.0.0.1:8085:8080 scruzzi-website:test)
+          trap 'docker rm --force "$container_id"' EXIT
+          for _ in 1 2 3 4 5; do
+            if curl --fail --silent http://127.0.0.1:8085/health >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          test "$(curl --fail --silent http://127.0.0.1:8085/health)" = '{"status": "ok"}'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: "22"
           package-manager-cache: false
+      - run: npm ci
       - name: Check commit messages
         if: github.event_name == 'pull_request'
         run: >-
-          npx --yes
-          -p @commitlint/cli@21.2.1
-          -p @commitlint/config-conventional@21.2.0
-          commitlint
+          npm run commitlint --
           --from "${{ github.event.pull_request.base.sha }}"
           --to "${{ github.event.pull_request.head.sha }}"
 
@@ -49,26 +62,19 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.value }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           persist-credentials: true
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: "22"
           package-manager-cache: false
+      - run: npm ci
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >-
-          npx --yes
-          -p semantic-release@24.2.9
-          -p @semantic-release/changelog@6.0.3
-          -p @semantic-release/exec@7.1.0
-          -p @semantic-release/git@10.0.1
-          -p @semantic-release/github@11.0.6
-          -p conventional-changelog-conventionalcommits@10.2.1
-          semantic-release
+        run: npm run release
       - id: version
         run: |
           if [ -f release.env ]; then
@@ -84,14 +90,14 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: docker/setup-buildx-action@v4
-      - uses: docker/login-action@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v7
+      - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
         with:
           context: .
           push: true

@@ -32,3 +32,33 @@ updates:
       docker:
         patterns:
           - "*"
+
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:30"
+      timezone: Etc/UTC
+    labels:
+      - dependencies
+      - python
+    groups:
+      python-dev-tools:
+        patterns:
+          - "*"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:45"
+      timezone: Etc/UTC
+    labels:
+      - dependencies
+      - javascript
+    groups:
+      node-dev-tools:
+        patterns:
+          - "*"

@@ -9,6 +9,7 @@ import hashlib
 import json
 import mimetypes
 import os
+from functools import lru_cache
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -36,14 +37,72 @@ COMPRESSIBLE_TYPES = {
     "image/svg+xml",
 }
 
-# Legacy path browsers request regardless of <link rel="icon">.
-ALIASES = {"favicon.ico": "favicon.svg"}
+# Only explicitly packaged public files are served. Keeping routing separate
+# from filesystem paths prevents request data from reaching path operations.
+PUBLIC_FILES = {
+    "": "index.html",
+    "index.html": "index.html",
+    "404.html": "404.html",
+    "style.css": "style.css",
+    "main.js": "main.js",
+    "theme.js": "theme.js",
+    "favicon.svg": "favicon.svg",
+    "favicon.ico": "favicon.svg",
+    "robots.txt": "robots.txt",
+    "sitemap.xml": "sitemap.xml",
+    "social-preview.png": "social-preview.png",
+}
+
+
+def read_public_file(filename):
+    """Read an allowlisted asset using constant path components only."""
+    match filename:
+        case "index.html":
+            path = PUBLIC_DIR / "index.html"
+        case "404.html":
+            path = PUBLIC_DIR / "404.html"
+        case "style.css":
+            path = PUBLIC_DIR / "style.css"
+        case "main.js":
+            path = PUBLIC_DIR / "main.js"
+        case "theme.js":
+            path = PUBLIC_DIR / "theme.js"
+        case "favicon.svg":
+            path = PUBLIC_DIR / "favicon.svg"
+        case "robots.txt":
+            path = PUBLIC_DIR / "robots.txt"
+        case "sitemap.xml":
+            path = PUBLIC_DIR / "sitemap.xml"
+        case "social-preview.png":
+            path = PUBLIC_DIR / "social-preview.png"
+        case _:
+            raise ValueError("asset is not allowlisted")
+    return path.read_bytes()
+
+
+@lru_cache(maxsize=32)
+def load_representation(filename, encoding):
+    """Load and optionally compress an unchanged static asset once."""
+    body = read_public_file(filename)
+    if encoding == "gzip":
+        body = gzip.compress(body, compresslevel=6, mtime=0)
+    etag = f'"{hashlib.sha256(body).hexdigest()[:16]}"'
+    return body, etag
+
+
+class PortfolioServer(ThreadingHTTPServer):
+    daemon_threads = True
+    request_queue_size = 128
 
 
 class PortfolioHandler(BaseHTTPRequestHandler):
     server_version = "scruzzi-web"
     sys_version = ""
     protocol_version = "HTTP/1.1"
+
+    def setup(self):
+        super().setup()
+        self.connection.settimeout(15)
 
     def do_GET(self):
         if urlparse(self.path).path == "/health":
@@ -65,23 +124,16 @@ class PortfolioHandler(BaseHTTPRequestHandler):
 
     def serve_static(self):
         request_path = unquote(urlparse(self.path).path).lstrip("/")
-        relative_path = request_path or "index.html"
-        relative_path = ALIASES.get(relative_path, relative_path)
-        static_path = (PUBLIC_DIR / relative_path).resolve()
-
-        if not static_path.is_file() or PUBLIC_DIR not in static_path.parents:
+        filename = PUBLIC_FILES.get(request_path)
+        if filename is None:
             self.respond_not_found()
             return
 
-        content_type = mimetypes.guess_type(static_path.name)[0] or "application/octet-stream"
-        cache_control = CACHE_POLICIES.get(static_path.suffix, "no-store")
-        body = static_path.read_bytes()
+        content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+        cache_control = CACHE_POLICIES.get(Path(filename).suffix, "no-store")
         compressible = content_type in COMPRESSIBLE_TYPES
         encoding = "gzip" if compressible and self.accepts_encoding("gzip") else None
-        if encoding:
-            body = gzip.compress(body, compresslevel=6, mtime=0)
-
-        etag = f'"{hashlib.sha256(body).hexdigest()[:16]}"'
+        body, etag = load_representation(filename, encoding)
         validators = self.parse_if_none_match()
         if "*" in validators or etag in validators:
             self.send_response(HTTPStatus.NOT_MODIFIED)
@@ -185,6 +237,6 @@ class PortfolioHandler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
-    server = ThreadingHTTPServer(("0.0.0.0", port), PortfolioHandler)
+    server = PortfolioServer(("0.0.0.0", port), PortfolioHandler)
     print(f"portfolio server listening on :{port}")
     server.serve_forever()

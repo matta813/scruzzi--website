@@ -1,8 +1,12 @@
 .git
-.gitlab-ci.yml
+.github
 .releaserc.json
 CHANGELOG.md
 README.md
 docker-compose.yaml
 social-preview-source.png
 node_modules
+package-lock.json
+package.json
+requirements-dev.txt
+tests

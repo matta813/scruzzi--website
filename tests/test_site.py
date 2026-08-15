@@ -3,6 +3,7 @@ import hashlib
 import inspect
 import json
 import re
+import struct
 from html.parser import HTMLParser
 from pathlib import Path
 from xml.etree import ElementTree
@@ -68,6 +69,16 @@ def test_social_metadata_and_crawler_files_are_present():
     assert "Sitemap: https://scruzzi.com/sitemap.xml" in (ROOT / "robots.txt").read_text()
     root = ElementTree.parse(ROOT / "sitemap.xml").getroot()
     assert root.tag.endswith("urlset")
+
+
+def test_social_preview_is_optimized_for_link_previews():
+    preview = ROOT / "social-preview.png"
+    assert preview.stat().st_size < 1_000_000
+    with preview.open("rb") as image:
+        assert image.read(8) == b"\x89PNG\r\n\x1a\n"
+        image.read(8)
+        width, height = struct.unpack(">II", image.read(8))
+    assert (width, height) == (1200, 630)
 
 
 def test_reveal_animation_is_progressive_enhancement():

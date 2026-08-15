@@ -20,6 +20,7 @@ def running_server(tmp_path, monkeypatch):
     (public_dir / "404.html").write_text("<h1>Nicht gefunden</h1>", encoding="utf-8")
     (public_dir / "secret.txt").write_text("top secret", encoding="utf-8")
     monkeypatch.setattr(server, "PUBLIC_DIR", public_dir)
+    server.load_representation.cache_clear()
 
     httpd = server.ThreadingHTTPServer(("127.0.0.1", 0), server.PortfolioHandler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
@@ -29,6 +30,7 @@ def running_server(tmp_path, monkeypatch):
     finally:
         httpd.shutdown()
         thread.join()
+        server.load_representation.cache_clear()
 
 
 def test_health_endpoint(running_server):
@@ -103,6 +105,20 @@ def test_gzip_compression_when_accepted(running_server):
     assert gzip.decompress(body) == b"body{color:red}" * 200
 
 
+def test_static_representation_cache_reuses_compressed_body(running_server):
+    server.load_representation.cache_clear()
+    host, port = running_server
+    for _ in range(2):
+        conn = http.client.HTTPConnection(host, port)
+        conn.request("GET", "/style.css", headers={"Accept-Encoding": "gzip"})
+        response = conn.getresponse()
+        assert response.status == 200
+        response.read()
+        conn.close()
+
+    assert server.load_representation.cache_info().hits == 1
+
+
 def test_no_compression_without_accept_encoding(running_server):
     host, port = running_server
     conn = http.client.HTTPConnection(host, port)
@@ -165,13 +181,13 @@ def test_if_none_match_wildcard_returns_304(running_server):
     assert resp.read() == b""
 
 
-def test_txt_file_served_with_cache_policy(running_server):
+def test_files_not_in_public_allowlist_are_not_served(running_server):
     host, port = running_server
     conn = http.client.HTTPConnection(host, port)
     conn.request("GET", "/secret.txt")
     resp = conn.getresponse()
-    assert resp.status == 200
-    assert resp.getheader("Cache-Control") == "public, max-age=86400"
+    resp.read()
+    assert resp.status == 404
 
 
 @pytest.mark.parametrize(

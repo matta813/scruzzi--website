@@ -30,31 +30,31 @@ docker run --rm -p 8085:8080 scruzzi-website
 ## Tests & Lint
 
 ```sh
-python3 -m pip install pytest ruff
+python3 -m pip install -r requirements-dev.txt
 ruff check server.py tests/
 python3 -m pytest tests/ -v
+npm ci
 ```
 
 ## Release & Deployment
 
-Lint, Tests und SAST laufen für Merge Requests sowie für Pushes auf `main`.
-Der Release- und Build-Flow läuft ausschließlich auf `main`
-(Details und benötigte CI-Variablen: Kommentar-Block in `.gitlab-ci.yml`):
+GitHub Actions führt Lint, Tests und CodeQL für Pull Requests sowie Pushes
+auf `main` aus. Releases und Image-Builds laufen ausschließlich auf `main`:
 
 ```
 Commit (Conventional Commits)
-  → MR: Lint (ruff) + Tests (pytest) + GitLab SAST
+  → Pull Request: Ruff + pytest + Commitlint + CodeQL
   → main: dieselben Prüfungen
-  → semantic-release: SemVer-Bump, CHANGELOG.md, Git-Tag vX.Y.Z, GitLab-Release
-  → Kaniko: Image-Build & Push  (:X.Y.Z, :sha-<commit>, :latest)
-  → Renovate (stündlich): erkennt den neuen Tag, MR im GitOps-Repo,
-    Patch-Updates automerged
+  → semantic-release: SemVer-Bump, CHANGELOG.md, Tag und GitHub Release
+  → Buildx: Image-Build und Push nach GHCR (:X.Y.Z, :sha-<commit>, :latest)
+  → Dependabot: wöchentliche Updates für Actions, Docker, Python und npm
   → FluxCD rollt die neue Version im Cluster aus
 ```
 
 - **Versionierung:** `fix:` → Patch, `feat:` → Minor,
   `BREAKING CHANGE:` → Major. Commits wie `chore:`/`docs:`/`ci:` lösen
-  kein Release (und damit keinen Build) aus.
+  kein Release aus. `chore(deps):` erzeugt für ausgerollte
+  Abhängigkeitsupdates automatisch einen Patch-Release.
 - **Runtime:** Container lauscht auf Port **8080**, Health-Endpoint
   unter `GET /health` (`{"status": "ok"}`) – kompatibel mit dem
   bestehenden Kubernetes-Deployment.

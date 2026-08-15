@@ -64,11 +64,21 @@ def test_structured_data_is_valid_json_and_allowed_by_csp():
 def test_social_metadata_and_crawler_files_are_present():
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     assert 'property="og:image"' in html
+    assert 'rel="canonical" href="https://scruzzi.com/"' in html
     assert 'name="twitter:card" content="summary_large_image"' in html
     assert (ROOT / "social-preview.png").is_file()
     assert "Sitemap: https://scruzzi.com/sitemap.xml" in (ROOT / "robots.txt").read_text()
     root = ElementTree.parse(ROOT / "sitemap.xml").getroot()
     assert root.tag.endswith("urlset")
+    assert root.find("{http://www.sitemaps.org/schemas/sitemap/0.9}url/{http://www.sitemaps.org/schemas/sitemap/0.9}loc").text == "https://scruzzi.com/"
+
+
+def test_document_has_language_viewport_and_single_main_heading():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert '<html lang="de"' in html
+    assert 'name="viewport"' in html
+    assert len(re.findall(r"<h1(?:\s|>)", html)) == 1
+    assert "<main" in html
 
 
 def test_social_preview_is_optimized_for_link_previews():

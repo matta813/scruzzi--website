@@ -5,6 +5,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Runtime uses only the standard library. Removing pip also removes its vendored
+# build-time packages and embedded third-party SBOM from the production image.
+RUN rm -rf /usr/local/lib/python3.14/site-packages/pip +    /usr/local/lib/python3.14/site-packages/pip-*.dist-info +    /usr/local/bin/pip /usr/local/bin/pip3 /usr/local/bin/pip3.14
+
 RUN addgroup -S app && adduser -S -G app app \
     && mkdir -p /app/public \
     && chown -R app:app /app

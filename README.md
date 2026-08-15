@@ -45,8 +45,9 @@ auf `main` aus. Releases und Image-Builds laufen ausschließlich auf `main`:
 Commit (Conventional Commits)
   → Pull Request: Ruff + pytest + Commitlint + CodeQL
   → main: dieselben Prüfungen
-  → semantic-release: SemVer-Bump, CHANGELOG.md, Tag und GitHub Release
-  → Buildx: Image-Build und Push nach GHCR (:X.Y.Z, :sha-<commit>, :latest)
+  → isoliertes semantic-release: SemVer-Bump, CHANGELOG, Tag und Release
+  → Trivy: Image-Scan auf hohe und kritische Schwachstellen
+  → Buildx: GHCR-Image mit SBOM und Provenance
   → Dependabot: wöchentliche Updates für Actions, Docker, Python und npm
   → FluxCD rollt die neue Version im Cluster aus
 ```
@@ -58,3 +59,6 @@ Commit (Conventional Commits)
 - **Runtime:** Container lauscht auf Port **8080**, Health-Endpoint
   unter `GET /health` (`{"status": "ok"}`) – kompatibel mit dem
   bestehenden Kubernetes-Deployment.
+- **Betrieb und Rollback:** siehe [OPERATIONS.md](OPERATIONS.md).
+- **Verfügbarkeit:** GitHub Actions prüft die Produktionsseite alle sechs
+  Stunden sowie bei manueller Ausführung.

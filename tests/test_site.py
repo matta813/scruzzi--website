@@ -103,3 +103,10 @@ def test_card_grids_fit_narrow_viewports():
     css = (ROOT / "style.css").read_text(encoding="utf-8")
     assert "minmax(min(100%, 285px), 1fr)" in css
     assert "minmax(min(100%, 300px), 1fr)" in css
+
+
+def test_mobile_navigation_supports_complete_dismissal():
+    javascript = (ROOT / "main.js").read_text(encoding="utf-8")
+    assert 'event.target.closest(".nav")' in javascript
+    assert 'matchMedia("(max-width: 560px)").addEventListener("change"' in javascript
+    assert "closeMenu({ restoreFocus: true })" in javascript

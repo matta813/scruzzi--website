@@ -83,7 +83,7 @@ def test_document_has_language_viewport_and_single_main_heading():
 
 def test_social_preview_is_optimized_for_link_previews():
     preview = ROOT / "social-preview.png"
-    assert preview.stat().st_size < 1_000_000
+    assert preview.stat().st_size < 250_000
     with preview.open("rb") as image:
         assert image.read(8) == b"\x89PNG\r\n\x1a\n"
         image.read(8)

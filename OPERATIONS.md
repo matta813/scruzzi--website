@@ -11,7 +11,10 @@ geprüft. SBOM und Build-Provenance werden zusammen mit dem Image publiziert.
 ## Überprüfung
 
 - `GET /health` muss mit HTTP 200 und `{"status": "ok"}` antworten.
-- Der Workflow `Availability` prüft `https://scruzzi.com` alle sechs Stunden.
+- Der Workflow `Availability` prüft `https://scruzzi.com` manuell.
+- GitHub-hosted Runner erreichen den Produktionshost derzeit nicht. Für einen
+  Zeitplan muss der Zugriff freigegeben oder ein externer Monitor verwendet
+  werden; bis dahin würde ein Zeitplan ausschließlich Fehlalarme erzeugen.
 - Ein Image kann über seinen unveränderlichen Digest oder
   `sha-<git-commit>` eindeutig einem Build zugeordnet werden.
 

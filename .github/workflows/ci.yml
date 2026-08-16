@@ -50,10 +50,13 @@ jobs:
       - run: npm run test:e2e
       - name: Check commit messages
         if: github.event_name == 'pull_request'
-        run: >-
-          npm run commitlint --
-          --from "${{ github.event.pull_request.base.sha }}"
-          --to "${{ github.event.pull_request.head.sha }}"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch --no-tags origin "$BASE_SHA" "$HEAD_SHA"
+          merge_base=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+          npm run commitlint -- --from "$merge_base" --to "$HEAD_SHA"
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

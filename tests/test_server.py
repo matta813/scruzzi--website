@@ -10,6 +10,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import server
 
 
+def test_public_dir_supports_repository_and_container_layouts(tmp_path):
+    app_dir = tmp_path / "app"
+    app_dir.mkdir()
+    assert server.resolve_public_dir(app_dir) == app_dir
+
+    public_dir = app_dir / "public"
+    public_dir.mkdir()
+    assert server.resolve_public_dir(app_dir) == public_dir
+    assert server.resolve_public_dir(app_dir, tmp_path / "custom") == (tmp_path / "custom").resolve()
+
+
 @pytest.fixture
 def running_server(tmp_path, monkeypatch):
     public_dir = tmp_path / "public"

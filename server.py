@@ -16,7 +16,17 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 APP_DIR = Path(__file__).resolve().parent
-PUBLIC_DIR = APP_DIR / "public"
+
+
+def resolve_public_dir(app_dir, configured=None):
+    """Use an explicit path, the container layout, or the repository root."""
+    if configured:
+        return Path(configured).expanduser().resolve()
+    packaged_dir = app_dir / "public"
+    return packaged_dir if packaged_dir.is_dir() else app_dir
+
+
+PUBLIC_DIR = resolve_public_dir(APP_DIR, os.environ.get("PUBLIC_DIR"))
 
 CACHE_POLICIES = {
     ".css": "public, max-age=3600",

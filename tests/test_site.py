@@ -86,6 +86,12 @@ def test_project_cards_include_concrete_results():
     assert html.count('class="project-result"') == 5
 
 
+def test_portfolio_includes_architecture_and_source_evidence():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'class="architecture-flow reveal"' in html
+    assert 'href="https://github.com/matta813/scruzzi--website"' in html
+
+
 def test_social_preview_is_optimized_for_link_previews():
     preview = ROOT / "social-preview.png"
     assert preview.stat().st_size < 250_000

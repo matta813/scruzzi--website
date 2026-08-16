@@ -222,7 +222,7 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         self.send_header(
             "Content-Security-Policy",
             "default-src 'self'; "
-            "script-src 'self' 'sha256-zaGNO1Ry0Q7+RgcJom0gzOg8neamY2e1po29WeD2Qng='; "
+            "script-src 'self' 'sha256-dwqWjq4pVEc/xk4ngiH07JLyMZyCHmwcNqML1GQ26wo='; "
             "style-src 'self'; "
             "img-src 'self' data:; "
             "connect-src 'self'; "

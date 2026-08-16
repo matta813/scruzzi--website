@@ -557,6 +557,50 @@ a {
 }
 
 /* ==========================================================================
+   Architektur
+   ========================================================================== */
+.architecture-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--bg-raised);
+  overflow: hidden;
+}
+
+.architecture-flow li {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.5rem;
+}
+
+.architecture-flow li + li {
+  border-left: 1px solid var(--border);
+}
+
+.architecture-flow li + li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  translate: -50% -50%;
+  padding: 0.1rem 0.35rem;
+  background: var(--bg-raised);
+  color: var(--accent);
+}
+
+.architecture-flow span,
+.architecture-flow small {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.architecture-flow span { font-size: 0.72rem; }
+.architecture-flow small { font-size: 0.75rem; }
+
+/* ==========================================================================
    Über mich
    ========================================================================== */
 .about-grid {
@@ -745,9 +789,33 @@ a {
   .hero {
     padding-block-start: 3.5rem;
   }
+
+  .architecture-flow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .architecture-flow li + li {
+    border-left: 0;
+  }
+
+  .architecture-flow li:nth-child(even) {
+    border-left: 1px solid var(--border);
+  }
+
+  .architecture-flow li:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
+  .architecture-flow li + li::before { display: none; }
 }
 
 @media (max-width: 560px) {
+  .architecture-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .architecture-flow li:nth-child(even) { border-left: 0; }
+  .architecture-flow li + li { border-top: 1px solid var(--border); }
   .js .menu-toggle {
     display: grid;
   }

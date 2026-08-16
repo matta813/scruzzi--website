@@ -26,7 +26,7 @@ test("mobile menu supports link, outside-click and keyboard dismissal", async ({
 
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await page.locator("h1").click();
+  await page.locator(".hero-actions").click();
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
 
   await toggle.click();

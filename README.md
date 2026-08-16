@@ -60,5 +60,6 @@ Commit (Conventional Commits)
   unter `GET /health` (`{"status": "ok"}`) – kompatibel mit dem
   bestehenden Kubernetes-Deployment.
 - **Betrieb und Rollback:** siehe [OPERATIONS.md](OPERATIONS.md).
-- **Verfügbarkeit:** GitHub Actions prüft die Produktionsseite alle sechs
-  Stunden sowie bei manueller Ausführung.
+- **Verfügbarkeit:** Der manuelle GitHub-Actions-Workflow prüft die
+  Produktionsseite. Automatische GitHub-hosted Checks benötigen zunächst
+  Netzwerkzugriff vom Runner zum Produktionshost.

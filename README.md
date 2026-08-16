@@ -43,6 +43,8 @@ python3 -m pip install -r requirements-dev.txt
 ruff check server.py tests/
 python3 -m pytest tests/ -v
 npm ci
+npx playwright install chromium
+npm run test:e2e
 ```
 
 ## Release & Deployment

@@ -536,6 +536,21 @@ a {
   color: var(--text-muted);
 }
 
+.project-card .project-result {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+}
+
+.project-result strong {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .project-card-cta {
   border-style: dashed;
   background: transparent;

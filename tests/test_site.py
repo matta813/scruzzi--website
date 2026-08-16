@@ -81,6 +81,11 @@ def test_document_has_language_viewport_and_single_main_heading():
     assert "<main" in html
 
 
+def test_project_cards_include_concrete_results():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert html.count('class="project-result"') == 5
+
+
 def test_social_preview_is_optimized_for_link_previews():
     preview = ROOT / "social-preview.png"
     assert preview.stat().st_size < 250_000

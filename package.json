@@ -2,10 +2,12 @@
   "name": "scruzzi-website-tooling",
   "private": true,
   "scripts": {
-    "commitlint": "commitlint"
+    "commitlint": "commitlint",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.2",
-    "@commitlint/config-conventional": "21.2.2"
+    "@commitlint/config-conventional": "21.2.2",
+    "@playwright/test": "^1.62.1"
   }
 }

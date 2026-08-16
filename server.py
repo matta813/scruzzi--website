@@ -16,7 +16,17 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 APP_DIR = Path(__file__).resolve().parent
-PUBLIC_DIR = APP_DIR / "public"
+
+
+def resolve_public_dir(app_dir, configured=None):
+    """Use an explicit path, the container layout, or the repository root."""
+    if configured:
+        return Path(configured).expanduser().resolve()
+    packaged_dir = app_dir / "public"
+    return packaged_dir if packaged_dir.is_dir() else app_dir
+
+
+PUBLIC_DIR = resolve_public_dir(APP_DIR, os.environ.get("PUBLIC_DIR"))
 
 CACHE_POLICIES = {
     ".css": "public, max-age=3600",
@@ -36,6 +46,9 @@ COMPRESSIBLE_TYPES = {
     "application/json",
     "image/svg+xml",
 }
+
+ASSET_VERSION = "2"
+VERSIONED_ASSETS = {"style.css", "main.js", "theme.js"}
 
 # Only explicitly packaged public files are served. Keeping routing separate
 # from filesystem paths prevents request data from reaching path operations.
@@ -113,6 +126,14 @@ class PortfolioHandler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self.do_GET()
 
+    def do_POST(self):
+        self.respond_method_not_allowed()
+
+    do_PUT = do_POST
+    do_PATCH = do_POST
+    do_DELETE = do_POST
+    do_OPTIONS = do_POST
+
     def send_error(self, code, message=None, explain=None):
         """Return consistent JSON errors without the stdlib HTML/version disclosure."""
         status = HTTPStatus(code)
@@ -123,7 +144,8 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         return self.command == "HEAD"
 
     def serve_static(self):
-        request_path = unquote(urlparse(self.path).path).lstrip("/")
+        request_url = urlparse(self.path)
+        request_path = unquote(request_url.path).lstrip("/")
         filename = PUBLIC_FILES.get(request_path)
         if filename is None:
             self.respond_not_found()
@@ -131,6 +153,8 @@ class PortfolioHandler(BaseHTTPRequestHandler):
 
         content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
         cache_control = CACHE_POLICIES.get(Path(filename).suffix, "no-store")
+        if filename in VERSIONED_ASSETS and request_url.query == f"v={ASSET_VERSION}":
+            cache_control = "public, max-age=31536000, immutable"
         compressible = content_type in COMPRESSIBLE_TYPES
         encoding = "gzip" if compressible and self.accepts_encoding("gzip") else None
         body, etag = load_representation(filename, encoding)
@@ -211,6 +235,17 @@ class PortfolioHandler(BaseHTTPRequestHandler):
     def respond_error(self, status, message):
         self.respond_json({"error": message}, status)
 
+    def respond_method_not_allowed(self):
+        body = json.dumps({"error": "Method not allowed"}).encode("utf-8")
+        self.send_response(HTTPStatus.METHOD_NOT_ALLOWED)
+        self.send_common_headers()
+        self.send_header("Allow", "GET, HEAD")
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def send_common_headers(self):
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("X-Content-Type-Options", "nosniff")
@@ -222,7 +257,7 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         self.send_header(
             "Content-Security-Policy",
             "default-src 'self'; "
-            "script-src 'self' 'sha256-zaGNO1Ry0Q7+RgcJom0gzOg8neamY2e1po29WeD2Qng='; "
+            "script-src 'self' 'sha256-dwqWjq4pVEc/xk4ngiH07JLyMZyCHmwcNqML1GQ26wo='; "
             "style-src 'self'; "
             "img-src 'self' data:; "
             "connect-src 'self'; "

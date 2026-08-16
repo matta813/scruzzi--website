@@ -6,6 +6,7 @@ import re
 import struct
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlsplit
 from xml.etree import ElementTree
 
 import server
@@ -29,7 +30,7 @@ class SiteParser(HTMLParser):
         for attribute in ("href", "src", "content"):
             value = attributes.get(attribute, "")
             if value != "/" and value.startswith("/") and not value.startswith("//"):
-                self.local_assets.append(value.removeprefix("/"))
+                self.local_assets.append(urlsplit(value).path.removeprefix("/"))
 
 
 def parse_site(filename="index.html"):
@@ -81,6 +82,17 @@ def test_document_has_language_viewport_and_single_main_heading():
     assert "<main" in html
 
 
+def test_project_cards_include_concrete_results():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert html.count('class="project-result"') == 5
+
+
+def test_portfolio_includes_architecture_and_source_evidence():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'class="architecture-flow reveal"' in html
+    assert 'href="https://github.com/matta813/scruzzi--website"' in html
+
+
 def test_social_preview_is_optimized_for_link_previews():
     preview = ROOT / "social-preview.png"
     assert preview.stat().st_size < 250_000
@@ -97,3 +109,16 @@ def test_reveal_animation_is_progressive_enhancement():
     assert 'class="no-js"' in html
     assert ".js .reveal" in css
     assert "\n.reveal {" not in css
+
+
+def test_card_grids_fit_narrow_viewports():
+    css = (ROOT / "style.css").read_text(encoding="utf-8")
+    assert "minmax(min(100%, 285px), 1fr)" in css
+    assert "minmax(min(100%, 300px), 1fr)" in css
+
+
+def test_mobile_navigation_supports_complete_dismissal():
+    javascript = (ROOT / "main.js").read_text(encoding="utf-8")
+    assert 'event.target.closest(".nav")' in javascript
+    assert 'matchMedia("(max-width: 560px)").addEventListener("change"' in javascript
+    assert "closeMenu({ restoreFocus: true })" in javascript

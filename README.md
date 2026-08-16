@@ -21,6 +21,15 @@ Statisches HTML/CSS/JS, ausgeliefert von einem minimalen Python-Server
 
 ## Lokal ausführen
 
+Direkt mit Python:
+
+```sh
+python3 server.py
+# → http://localhost:8080
+```
+
+Alternativ im produktionsnahen Container:
+
 ```sh
 docker build -t scruzzi-website .
 docker run --rm -p 8085:8080 scruzzi-website
@@ -34,6 +43,8 @@ python3 -m pip install -r requirements-dev.txt
 ruff check server.py tests/
 python3 -m pytest tests/ -v
 npm ci
+npx playwright install chromium
+npm run test:e2e
 ```
 
 ## Release & Deployment

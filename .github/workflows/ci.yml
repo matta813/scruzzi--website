@@ -46,12 +46,21 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
       - name: Check commit messages
         if: github.event_name == 'pull_request'
-        run: >-
-          npm run commitlint --
-          --from "${{ github.event.pull_request.base.sha }}"
-          --to "${{ github.event.pull_request.head.sha }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          while read -r commit_sha; do
+            gh api "repos/$REPOSITORY/commits/$commit_sha" --jq '.commit.message' |
+              npm run commitlint
+          done < <(
+            gh api --paginate "repos/$REPOSITORY/pulls/$PR_NUMBER/commits" --jq '.[].sha'
+          )
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

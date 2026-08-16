@@ -10,6 +10,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import server
 
 
+def test_public_dir_supports_repository_and_container_layouts(tmp_path):
+    app_dir = tmp_path / "app"
+    app_dir.mkdir()
+    assert server.resolve_public_dir(app_dir) == app_dir
+
+    public_dir = app_dir / "public"
+    public_dir.mkdir()
+    assert server.resolve_public_dir(app_dir) == public_dir
+    assert server.resolve_public_dir(app_dir, tmp_path / "custom") == (tmp_path / "custom").resolve()
+
+
 @pytest.fixture
 def running_server(tmp_path, monkeypatch):
     public_dir = tmp_path / "public"
@@ -129,6 +140,20 @@ def test_no_compression_without_accept_encoding(running_server):
     assert body == b"body{color:red}" * 200
 
 
+def test_versioned_assets_use_immutable_cache(running_server):
+    host, port = running_server
+    conn = http.client.HTTPConnection(host, port)
+    conn.request("GET", f"/style.css?v={server.ASSET_VERSION}")
+    resp = conn.getresponse()
+    resp.read()
+    assert resp.getheader("Cache-Control") == "public, max-age=31536000, immutable"
+
+    conn.request("GET", "/style.css")
+    resp = conn.getresponse()
+    resp.read()
+    assert resp.getheader("Cache-Control") == "public, max-age=3600"
+
+
 @pytest.mark.parametrize("value", ["gzip;q=0", "br, gzip;q=0.0", "xgzip"])
 def test_gzip_not_used_when_not_accepted(running_server, value):
     host, port = running_server
@@ -227,15 +252,17 @@ def test_security_headers_present_on_json_response(running_server, header, expec
     assert expected_substring in (resp.getheader(header) or "")
 
 
-def test_unsupported_method_uses_hardened_json_error(running_server):
+@pytest.mark.parametrize("method", ["POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+def test_unsupported_method_uses_hardened_json_error(running_server, method):
     host, port = running_server
     conn = http.client.HTTPConnection(host, port)
-    conn.request("POST", "/")
+    conn.request(method, "/")
     resp = conn.getresponse()
     body = resp.read()
 
-    assert resp.status == 501
+    assert resp.status == 405
+    assert resp.getheader("Allow") == "GET, HEAD"
     assert resp.getheader("Content-Type") == "application/json"
     assert resp.getheader("X-Frame-Options") == "DENY"
     assert "Python" not in (resp.getheader("Server") or "")
-    assert b"Unsupported method" in body
+    assert b"Method not allowed" in body

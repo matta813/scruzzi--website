@@ -11,9 +11,15 @@ function updateThemeControl(theme) {
   toggle.setAttribute("aria-label", lightActive ? "Dunkles Design aktivieren" : "Helles Design aktivieren");
 }
 
-function closeMenu() {
+function menuIsOpen() {
+  return menuToggle.getAttribute("aria-expanded") === "true";
+}
+
+function closeMenu({ restoreFocus = false } = {}) {
+  const wasOpen = menuIsOpen();
   menuToggle.setAttribute("aria-expanded", "false");
   menuToggle.setAttribute("aria-label", "Navigation öffnen");
+  if (restoreFocus && wasOpen) menuToggle.focus();
 }
 
 updateThemeControl(document.documentElement.dataset.theme);
@@ -37,7 +43,7 @@ toggle.addEventListener("click", () => {
 });
 
 menuToggle.addEventListener("click", () => {
-  const expanded = menuToggle.getAttribute("aria-expanded") === "true";
+  const expanded = menuIsOpen();
   menuToggle.setAttribute("aria-expanded", String(!expanded));
   menuToggle.setAttribute("aria-label", expanded ? "Navigation öffnen" : "Navigation schließen");
 });
@@ -47,7 +53,15 @@ navLinks.addEventListener("click", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeMenu();
+  if (event.key === "Escape") closeMenu({ restoreFocus: true });
+});
+
+document.addEventListener("click", (event) => {
+  if (menuIsOpen() && !event.target.closest(".nav")) closeMenu();
+});
+
+window.matchMedia("(max-width: 560px)").addEventListener("change", (event) => {
+  if (!event.matches) closeMenu();
 });
 
 // --- Scroll reveal ----------------------------------------------------------

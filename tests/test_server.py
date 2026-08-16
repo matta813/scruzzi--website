@@ -140,6 +140,20 @@ def test_no_compression_without_accept_encoding(running_server):
     assert body == b"body{color:red}" * 200
 
 
+def test_versioned_assets_use_immutable_cache(running_server):
+    host, port = running_server
+    conn = http.client.HTTPConnection(host, port)
+    conn.request("GET", f"/style.css?v={server.ASSET_VERSION}")
+    resp = conn.getresponse()
+    resp.read()
+    assert resp.getheader("Cache-Control") == "public, max-age=31536000, immutable"
+
+    conn.request("GET", "/style.css")
+    resp = conn.getresponse()
+    resp.read()
+    assert resp.getheader("Cache-Control") == "public, max-age=3600"
+
+
 @pytest.mark.parametrize("value", ["gzip;q=0", "br, gzip;q=0.0", "xgzip"])
 def test_gzip_not_used_when_not_accepted(running_server, value):
     host, port = running_server

@@ -6,6 +6,7 @@ import re
 import struct
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlsplit
 from xml.etree import ElementTree
 
 import server
@@ -29,7 +30,7 @@ class SiteParser(HTMLParser):
         for attribute in ("href", "src", "content"):
             value = attributes.get(attribute, "")
             if value != "/" and value.startswith("/") and not value.startswith("//"):
-                self.local_assets.append(value.removeprefix("/"))
+                self.local_assets.append(urlsplit(value).path.removeprefix("/"))
 
 
 def parse_site(filename="index.html"):

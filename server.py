@@ -47,6 +47,9 @@ COMPRESSIBLE_TYPES = {
     "image/svg+xml",
 }
 
+ASSET_VERSION = "2"
+VERSIONED_ASSETS = {"style.css", "main.js", "theme.js"}
+
 # Only explicitly packaged public files are served. Keeping routing separate
 # from filesystem paths prevents request data from reaching path operations.
 PUBLIC_FILES = {
@@ -141,7 +144,8 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         return self.command == "HEAD"
 
     def serve_static(self):
-        request_path = unquote(urlparse(self.path).path).lstrip("/")
+        request_url = urlparse(self.path)
+        request_path = unquote(request_url.path).lstrip("/")
         filename = PUBLIC_FILES.get(request_path)
         if filename is None:
             self.respond_not_found()
@@ -149,6 +153,8 @@ class PortfolioHandler(BaseHTTPRequestHandler):
 
         content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
         cache_control = CACHE_POLICIES.get(Path(filename).suffix, "no-store")
+        if filename in VERSIONED_ASSETS and request_url.query == f"v={ASSET_VERSION}":
+            cache_control = "public, max-age=31536000, immutable"
         compressible = content_type in COMPRESSIBLE_TYPES
         encoding = "gzip" if compressible and self.accepts_encoding("gzip") else None
         body, etag = load_representation(filename, encoding)

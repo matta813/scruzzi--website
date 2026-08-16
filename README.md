@@ -47,7 +47,7 @@ Commit (Conventional Commits)
   → main: dieselben Prüfungen
   → isoliertes semantic-release: SemVer-Bump, CHANGELOG, Tag und Release
   → Trivy: Image-Scan auf hohe und kritische Schwachstellen
-  → Buildx: GHCR-Image mit SBOM und Provenance
+  → Buildx: AMD64-/ARM64-GHCR-Image mit SBOM und Provenance
   → Dependabot: wöchentliche Updates für Actions, Docker, Python und npm
   → FluxCD rollt die neue Version im Cluster aus
 ```
@@ -60,6 +60,8 @@ Commit (Conventional Commits)
   unter `GET /health` (`{"status": "ok"}`) – kompatibel mit dem
   bestehenden Kubernetes-Deployment.
 - **Betrieb und Rollback:** siehe [OPERATIONS.md](OPERATIONS.md).
+- **Architekturen:** veröffentlichte Images unterstützen `linux/amd64` und
+  `linux/arm64`; beide Varianten werden vor dem Push separat gescannt.
 - **Verfügbarkeit:** Der manuelle GitHub-Actions-Workflow prüft die
   Produktionsseite. Automatische GitHub-hosted Checks benötigen zunächst
   Netzwerkzugriff vom Runner zum Produktionshost.

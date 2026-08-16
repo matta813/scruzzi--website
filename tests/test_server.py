@@ -227,15 +227,17 @@ def test_security_headers_present_on_json_response(running_server, header, expec
     assert expected_substring in (resp.getheader(header) or "")
 
 
-def test_unsupported_method_uses_hardened_json_error(running_server):
+@pytest.mark.parametrize("method", ["POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+def test_unsupported_method_uses_hardened_json_error(running_server, method):
     host, port = running_server
     conn = http.client.HTTPConnection(host, port)
-    conn.request("POST", "/")
+    conn.request(method, "/")
     resp = conn.getresponse()
     body = resp.read()
 
-    assert resp.status == 501
+    assert resp.status == 405
+    assert resp.getheader("Allow") == "GET, HEAD"
     assert resp.getheader("Content-Type") == "application/json"
     assert resp.getheader("X-Frame-Options") == "DENY"
     assert "Python" not in (resp.getheader("Server") or "")
-    assert b"Unsupported method" in body
+    assert b"Method not allowed" in body

@@ -113,6 +113,14 @@ class PortfolioHandler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self.do_GET()
 
+    def do_POST(self):
+        self.respond_method_not_allowed()
+
+    do_PUT = do_POST
+    do_PATCH = do_POST
+    do_DELETE = do_POST
+    do_OPTIONS = do_POST
+
     def send_error(self, code, message=None, explain=None):
         """Return consistent JSON errors without the stdlib HTML/version disclosure."""
         status = HTTPStatus(code)
@@ -210,6 +218,17 @@ class PortfolioHandler(BaseHTTPRequestHandler):
 
     def respond_error(self, status, message):
         self.respond_json({"error": message}, status)
+
+    def respond_method_not_allowed(self):
+        body = json.dumps({"error": "Method not allowed"}).encode("utf-8")
+        self.send_response(HTTPStatus.METHOD_NOT_ALLOWED)
+        self.send_common_headers()
+        self.send_header("Allow", "GET, HEAD")
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def send_common_headers(self):
         self.send_header("X-Frame-Options", "DENY")

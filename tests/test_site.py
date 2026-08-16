@@ -97,3 +97,9 @@ def test_reveal_animation_is_progressive_enhancement():
     assert 'class="no-js"' in html
     assert ".js .reveal" in css
     assert "\n.reveal {" not in css
+
+
+def test_card_grids_fit_narrow_viewports():
+    css = (ROOT / "style.css").read_text(encoding="utf-8")
+    assert "minmax(min(100%, 285px), 1fr)" in css
+    assert "minmax(min(100%, 300px), 1fr)" in css

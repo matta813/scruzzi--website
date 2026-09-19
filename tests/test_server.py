@@ -31,6 +31,7 @@ def running_server(tmp_path, monkeypatch):
     (public_dir / "404.html").write_text("<h1>Nicht gefunden</h1>", encoding="utf-8")
     (public_dir / "secret.txt").write_text("top secret", encoding="utf-8")
     monkeypatch.setattr(server, "PUBLIC_DIR", public_dir)
+    server.asset_version.cache_clear()
     server.load_representation.cache_clear()
 
     httpd = server.ThreadingHTTPServer(("127.0.0.1", 0), server.PortfolioHandler)
@@ -41,6 +42,7 @@ def running_server(tmp_path, monkeypatch):
     finally:
         httpd.shutdown()
         thread.join()
+        server.asset_version.cache_clear()
         server.load_representation.cache_clear()
 
 
@@ -143,10 +145,27 @@ def test_no_compression_without_accept_encoding(running_server):
 def test_versioned_assets_use_immutable_cache(running_server):
     host, port = running_server
     conn = http.client.HTTPConnection(host, port)
-    conn.request("GET", f"/style.css?v={server.ASSET_VERSION}")
+    conn.request("GET", f"/style.css?v={server.asset_version('style.css')}")
     resp = conn.getresponse()
     resp.read()
     assert resp.getheader("Cache-Control") == "public, max-age=31536000, immutable"
+
+
+def test_index_replaces_asset_version_placeholders(running_server):
+    public_dir = server.PUBLIC_DIR
+    (public_dir / "index.html").write_text(
+        '<link href="/style.css?v={{asset:style.css}}">', encoding="utf-8"
+    )
+    server.asset_version.cache_clear()
+    server.load_representation.cache_clear()
+
+    host, port = running_server
+    conn = http.client.HTTPConnection(host, port)
+    conn.request("GET", "/")
+    response = conn.getresponse()
+
+    expected = f'<link href="/style.css?v={server.asset_version("style.css")}">'.encode()
+    assert response.read() == expected
 
     conn.request("GET", "/style.css")
     resp = conn.getresponse()

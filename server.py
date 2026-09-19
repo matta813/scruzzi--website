@@ -47,7 +47,6 @@ COMPRESSIBLE_TYPES = {
     "image/svg+xml",
 }
 
-ASSET_VERSION = "2"
 VERSIONED_ASSETS = {"style.css", "main.js", "theme.js"}
 
 # Only explicitly packaged public files are served. Keeping routing separate
@@ -93,10 +92,21 @@ def read_public_file(filename):
     return path.read_bytes()
 
 
+@lru_cache(maxsize=16)
+def asset_version(filename):
+    """Return a content hash suitable for immutable asset URLs."""
+    return hashlib.sha256(read_public_file(filename)).hexdigest()[:12]
+
+
 @lru_cache(maxsize=32)
 def load_representation(filename, encoding):
     """Load and optionally compress an unchanged static asset once."""
     body = read_public_file(filename)
+    if filename == "index.html":
+        for asset in VERSIONED_ASSETS:
+            placeholder = f"{{{{asset:{asset}}}}}".encode()
+            if placeholder in body:
+                body = body.replace(placeholder, asset_version(asset).encode())
     if encoding == "gzip":
         body = gzip.compress(body, compresslevel=6, mtime=0)
     etag = f'"{hashlib.sha256(body).hexdigest()[:16]}"'
@@ -153,7 +163,7 @@ class PortfolioHandler(BaseHTTPRequestHandler):
 
         content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
         cache_control = CACHE_POLICIES.get(Path(filename).suffix, "no-store")
-        if filename in VERSIONED_ASSETS and request_url.query == f"v={ASSET_VERSION}":
+        if filename in VERSIONED_ASSETS and request_url.query == f"v={asset_version(filename)}":
             cache_control = "public, max-age=31536000, immutable"
         compressible = content_type in COMPRESSIBLE_TYPES
         encoding = "gzip" if compressible and self.accepts_encoding("gzip") else None

@@ -118,6 +118,20 @@ def test_gzip_compression_when_accepted(running_server):
     assert gzip.decompress(body) == b"body{color:red}" * 200
 
 
+def test_brotli_representation_is_preferred_when_packaged(running_server):
+    public_dir = server.PUBLIC_DIR
+    (public_dir / "style.css.br").write_bytes(b"brotli-body")
+    server.load_representation.cache_clear()
+
+    host, port = running_server
+    conn = http.client.HTTPConnection(host, port)
+    conn.request("GET", "/style.css", headers={"Accept-Encoding": "br, gzip"})
+    response = conn.getresponse()
+
+    assert response.getheader("Content-Encoding") == "br"
+    assert response.read() == b"brotli-body"
+
+
 def test_static_representation_cache_reuses_compressed_body(running_server):
     server.load_representation.cache_clear()
     host, port = running_server

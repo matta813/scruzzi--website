@@ -98,11 +98,15 @@ def asset_version(filename):
     return hashlib.sha256(read_public_file(filename)).hexdigest()[:12]
 
 
+def has_brotli_representation(filename):
+    return (PUBLIC_DIR / f"{filename}.br").is_file()
+
+
 @lru_cache(maxsize=32)
 def load_representation(filename, encoding):
     """Load and optionally compress an unchanged static asset once."""
-    body = read_public_file(filename)
-    if filename == "index.html":
+    body = (PUBLIC_DIR / f"{filename}.br").read_bytes() if encoding == "br" else read_public_file(filename)
+    if filename == "index.html" and encoding != "br":
         for asset in VERSIONED_ASSETS:
             placeholder = f"{{{{asset:{asset}}}}}".encode()
             if placeholder in body:
@@ -166,7 +170,11 @@ class PortfolioHandler(BaseHTTPRequestHandler):
         if filename in VERSIONED_ASSETS and request_url.query == f"v={asset_version(filename)}":
             cache_control = "public, max-age=31536000, immutable"
         compressible = content_type in COMPRESSIBLE_TYPES
-        encoding = "gzip" if compressible and self.accepts_encoding("gzip") else None
+        encoding = None
+        if compressible and self.accepts_encoding("br") and has_brotli_representation(filename):
+            encoding = "br"
+        elif compressible and self.accepts_encoding("gzip"):
+            encoding = "gzip"
         body, etag = load_representation(filename, encoding)
         validators = self.parse_if_none_match()
         if "*" in validators or etag in validators:

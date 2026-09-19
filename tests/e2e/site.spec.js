@@ -1,4 +1,11 @@
 const { test, expect } = require("@playwright/test");
+const AxeBuilder = require("@axe-core/playwright").default;
+
+test("page has no serious accessibility violations", async ({ page }) => {
+  await page.goto("/");
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations.filter(({ impact }) => ["critical", "serious"].includes(impact))).toEqual([]);
+});
 
 test("page has no horizontal overflow", async ({ page }) => {
   await page.goto("/");

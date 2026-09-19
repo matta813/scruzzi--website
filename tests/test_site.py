@@ -93,6 +93,13 @@ def test_portfolio_includes_architecture_and_source_evidence():
     assert 'href="https://github.com/matta813/scruzzi--website"' in html
 
 
+def test_portfolio_links_to_public_work_samples():
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'href="https://github.com/matta813/velora-dns"' in html
+    assert 'href="https://github.com/matta813/PGSentinel"' in html
+    assert 'href="https://github.com/matta813/channieinifigge--website"' in html
+
+
 def test_social_preview_is_optimized_for_link_previews():
     preview = ROOT / "social-preview.png"
     assert preview.stat().st_size < 250_000

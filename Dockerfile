@@ -1,16 +1,23 @@
 ARG NODE_IMAGE=node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
 
-FROM ${NODE_IMAGE} AS deps
+# Dependencies and the Next.js build run natively on the build host; the
+# standalone output is plain JavaScript, so only the runtime stage is per-arch.
+FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
-FROM ${NODE_IMAGE} AS builder
+FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+RUN npm run build \
+    # sharp is only used for image optimisation, which is disabled; its native
+    # binary would otherwise tie the output to the build architecture.
+    && rm -rf .next/standalone/node_modules/sharp \
+        .next/standalone/node_modules/@img \
+        .next/standalone/node_modules/@emnapi
 
 FROM ${NODE_IMAGE} AS runner
 WORKDIR /app

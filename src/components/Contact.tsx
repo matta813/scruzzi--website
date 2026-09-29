@@ -57,7 +57,7 @@ export function Contact() {
 
       <div className="flex flex-wrap justify-between gap-2 border-t border-ink/20 px-4 py-5 md:px-8">
         <p className="micro text-ink/70">© {new Date().getFullYear()} {site.fullName}</p>
-        <p className="micro text-ink/70">Selbst gehostet auf dem eigenen Kubernetes-Cluster</p>
+        <p className="micro text-ink/70">Selbst gehostet im eigenen Homelab</p>
       </div>
     </footer>
   );

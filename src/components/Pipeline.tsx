@@ -35,7 +35,7 @@ export function Pipeline() {
 
   return (
     <section ref={root} aria-labelledby="pipeline-title" className="relative px-4 py-24 md:px-8 md:py-36">
-      <SectionHead id="pipeline-title" chip="Pipeline" title="Vom Commit zum Dienst" />
+      <SectionHead id="pipeline-title" chip="Diese Website" title="Vom Commit zum Release" />
 
       <div data-flow className="relative">
         <div aria-hidden="true" className="absolute top-8 right-0 left-0 hidden h-px bg-line md:block">

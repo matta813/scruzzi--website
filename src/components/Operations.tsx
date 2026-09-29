@@ -56,7 +56,7 @@ export function Operations() {
 
   return (
     <section ref={root} id="betrieb" aria-labelledby="betrieb-title" className="relative px-4 py-24 md:px-8 md:py-36">
-      <SectionHead id="betrieb-title" chip="Im Dauerbetrieb" title="Was ich betreue" align="center" />
+      <SectionHead id="betrieb-title" chip="Homelab" title="Was ich betreue" align="center" />
 
       <div className="grid gap-6 lg:grid-cols-5 lg:gap-0">
         <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pr-6">

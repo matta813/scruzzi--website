@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: "/social-preview.png",
         width: 1200,
         height: 630,
-        alt: "Mattia Scruzzi, Plattformentwickler für Kubernetes und GitOps",
+        alt: "Mattia Scruzzi, Plattformentwickler EFZ in Ausbildung",
       },
     ],
   },

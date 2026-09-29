@@ -33,7 +33,7 @@ test("portfolio links to source and public work samples", async ({ page }) => {
     "https://github.com/matta813/scruzzi--website",
     "https://github.com/matta813/velora-dns",
     "https://github.com/matta813/PGSentinel",
-    "https://github.com/matta813/channieinifigge--website",
+    "https://github.com/matta813/THE-OTHER-PLAYER",
   ]) {
     await expect(page.locator(`a[href="${href}"]`).first()).toBeAttached();
   }
@@ -42,10 +42,10 @@ test("portfolio links to source and public work samples", async ({ page }) => {
 test("operations switch the detail view", async ({ page }) => {
   await page.goto("/");
   const stage = page.locator("#ops-stage");
-  await expect(stage.getByRole("heading", { level: 3 })).toHaveText("Mehrknotiger Kubernetes-Cluster");
-  const button = page.getByRole("button", { name: /Datenbanken/ }).first();
+  await expect(stage.getByRole("heading", { level: 3 })).toHaveText("Zwei-Node-Proxmox-Cluster");
+  const button = page.getByRole("button", { name: /Netzwerk & DNS/ }).first();
   await button.click();
-  await expect(stage.getByRole("heading", { level: 3 })).toHaveText("Zentrale Datenbank-Infrastruktur");
+  await expect(stage.getByRole("heading", { level: 3 })).toHaveText("Segmentiertes Netzwerk");
   await expect(button).toHaveAttribute("aria-pressed", "true");
 });
 

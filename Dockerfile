@@ -41,6 +41,7 @@ COPY --chown=app:app favicon.svg /app/public/favicon.svg
 COPY --chown=app:app robots.txt /app/public/robots.txt
 COPY --chown=app:app sitemap.xml /app/public/sitemap.xml
 COPY --chown=app:app social-preview.png /app/public/social-preview.png
+COPY --chown=app:app fonts/mona-sans.woff2 fonts/jetbrains-mono.woff2 /app/public/fonts/
 
 USER app
 

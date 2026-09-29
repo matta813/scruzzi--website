@@ -14,6 +14,7 @@ Statisches HTML/CSS/JS, ausgeliefert von einem minimalen Python-Server
 | `theme.js`     | Blocking Theme-Init (kein Farb-Flackern)          |
 | `main.js`      | Theme-Toggle + Scroll-Reveal                      |
 | `server.py`    | Statischer Fileserver auf `:8080` mit `/health`   |
+| `fonts/`       | Selbst gehostete Schriften (Mona Sans, JetBrains Mono; SIL OFL) |
 | `favicon.svg`  | Favicon (auch unter `/favicon.ico` ausgeliefert)  |
 | `social-preview.png` | Vorschaubild für LinkedIn/Open Graph       |
 | `robots.txt` / `sitemap.xml` | Crawler- und Suchmaschinen-Metadaten |

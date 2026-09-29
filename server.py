@@ -63,6 +63,8 @@ PUBLIC_FILES = {
     "robots.txt": "robots.txt",
     "sitemap.xml": "sitemap.xml",
     "social-preview.png": "social-preview.png",
+    "fonts/mona-sans.woff2": "fonts/mona-sans.woff2",
+    "fonts/jetbrains-mono.woff2": "fonts/jetbrains-mono.woff2",
 }
 
 
@@ -87,6 +89,10 @@ def read_public_file(filename):
             path = PUBLIC_DIR / "sitemap.xml"
         case "social-preview.png":
             path = PUBLIC_DIR / "social-preview.png"
+        case "fonts/mona-sans.woff2":
+            path = PUBLIC_DIR / "fonts" / "mona-sans.woff2"
+        case "fonts/jetbrains-mono.woff2":
+            path = PUBLIC_DIR / "fonts" / "jetbrains-mono.woff2"
         case _:
             raise ValueError("asset is not allowlisted")
     return path.read_bytes()

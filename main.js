@@ -85,3 +85,26 @@ if (!reduceMotion && "IntersectionObserver" in window) {
 } else {
   revealables.forEach((el) => el.classList.add("is-visible"));
 }
+
+// --- Current section in navigation -----------------------------------------
+const navAnchors = [...navLinks.querySelectorAll('a[href^="#"]')];
+const trackedSections = navAnchors
+  .map((link) => document.getElementById(link.hash.slice(1)))
+  .filter(Boolean);
+
+if ("IntersectionObserver" in window) {
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        for (const link of navAnchors) {
+          if (link.hash === `#${entry.target.id}`) link.setAttribute("aria-current", "true");
+          else link.removeAttribute("aria-current");
+        }
+      }
+    },
+    { rootMargin: "-45% 0px -50% 0px" }
+  );
+
+  trackedSections.forEach((section) => sectionObserver.observe(section));
+}

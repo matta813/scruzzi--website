@@ -7,15 +7,16 @@
   <meta name="color-scheme" content="dark light">
   <title>Seite nicht gefunden · Mattia</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <script src="/theme.js?v=2"></script>
-  <link rel="stylesheet" href="/style.css?v=2">
+  <link rel="preload" href="/fonts/mona-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="/theme.js?v=3"></script>
+  <link rel="stylesheet" href="/style.css?v=3">
 </head>
 <body class="error-page">
   <main class="error-card">
-    <p class="section-eyebrow">404 · not found</p>
+    <p class="error-code">404</p>
     <h1>Diese Route läuft ins Leere.</h1>
     <p>Die gesuchte Seite existiert nicht oder wurde verschoben.</p>
-    <a class="btn btn-primary" href="/">Zurück zur Startseite</a>
+    <a class="btn btn-primary" href="/">Zur Startseite <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3M7.5 3.5 3 8l4.5 4.5"/></svg></span></a>
   </main>
 </body>
 </html>

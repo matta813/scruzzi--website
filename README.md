@@ -1,51 +1,47 @@
 # scruzzi-website
 
 Persönliche Portfolio-Website – Plattformentwickler in Ausbildung.
-Statisches HTML/CSS/JS, ausgeliefert von einem minimalen Python-Server
-(stdlib only, kein Framework, kein Build-Step).
+Next.js (App Router) mit TypeScript, Tailwind CSS, GSAP/ScrollTrigger und
+Lenis-Smooth-Scroll, ausgeliefert als Standalone-Node-Server im Container.
 
 ## Struktur
 
-| Datei          | Zweck                                             |
-| -------------- | ------------------------------------------------- |
-| `index.html`   | Die gesamte Seite (One-Pager)                     |
-| `404.html`     | Eigene Fehlerseite für unbekannte Routen          |
-| `style.css`    | Design (Dark Mode als Standard, Light-Toggle)     |
-| `theme.js`     | Blocking Theme-Init (kein Farb-Flackern)          |
-| `main.js`      | Theme-Toggle + Scroll-Reveal                      |
-| `server.py`    | Statischer Fileserver auf `:8080` mit `/health`   |
-| `fonts/`       | Selbst gehostete Schriften (Mona Sans, JetBrains Mono; SIL OFL) |
-| `favicon.svg`  | Favicon (auch unter `/favicon.ico` ausgeliefert)  |
-| `social-preview.png` | Vorschaubild für LinkedIn/Open Graph       |
-| `robots.txt` / `sitemap.xml` | Crawler- und Suchmaschinen-Metadaten |
-| `tests/`       | pytest-Suite für Server und Website               |
+| Pfad | Zweck |
+| --- | --- |
+| `src/content/site.ts` | Alle Inhalte (Texte, Skills, Projekte, Links) an einer Stelle |
+| `src/app/` | Layout, Startseite, 404, `robots.txt`, `sitemap.xml`, `/health` |
+| `src/app/fonts/` | Selbst gehostete Schriften (Rajdhani, DM Sans; SIL OFL) |
+| `src/components/` | Sektionen (Intro, Stats, Skills, Projekte, Betrieb, Pipeline, Über mich, Kontakt) und Effekte |
+| `src/components/DitherPortrait.tsx` | RGB-Dot-Matrix-Visual; nimmt optional ein Foto über `src` |
+| `src/lib/` | GSAP-Registrierung, Web-Audio-Sound |
+| `src/proxy.ts` | Content-Security-Policy mit Nonce pro Request |
+| `next.config.ts` | Standalone-Output und statische Security-Header |
+| `public/` | Social-Preview-Bild |
+| `tests/e2e/` | Playwright-Tests inkl. axe-Accessibility-Check |
 
 ## Lokal ausführen
 
-Direkt mit Python:
-
 ```sh
-python3 server.py
-# → http://localhost:8080
+npm ci
+npm run dev
+# → http://localhost:3000
 ```
 
-Alternativ im produktionsnahen Container:
+Produktionsnah im Container:
 
 ```sh
 docker build -t scruzzi-website .
-docker run --rm -p 8085:8080 scruzzi-website
+docker run --rm --read-only --tmpfs /tmp -p 8085:8080 scruzzi-website
 # → http://localhost:8085
 ```
 
 ## Tests & Lint
 
 ```sh
-python3 -m pip install -r requirements-dev.txt
-ruff check server.py tests/
-python3 -m pytest tests/ -v
-npm ci
+npm run lint
+npm run typecheck
 npx playwright install chromium
-npm run test:e2e
+npm run test:e2e   # baut die App und startet sie auf Port 4173
 ```
 
 ## Release & Deployment
@@ -55,12 +51,12 @@ auf `main` aus. Releases und Image-Builds laufen ausschließlich auf `main`:
 
 ```
 Commit (Conventional Commits)
-  → Pull Request: Ruff + pytest + Commitlint + CodeQL
+  → Pull Request: ESLint + tsc + Build + Container-Smoke-Test + Playwright + Commitlint + CodeQL
   → main: dieselben Prüfungen
   → isoliertes semantic-release: SemVer-Bump, CHANGELOG, Tag und Release
   → Trivy: Image-Scan auf hohe und kritische Schwachstellen
   → Buildx: AMD64-/ARM64-GHCR-Image mit SBOM und Provenance
-  → Dependabot: wöchentliche Updates für Actions, Docker, Python und npm
+  → Dependabot: wöchentliche Updates für Actions, Docker und npm
   → FluxCD rollt die neue Version im Cluster aus
 ```
 

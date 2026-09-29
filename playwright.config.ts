@@ -1,6 +1,6 @@
-const { defineConfig, devices } = require("@playwright/test");
+import { defineConfig, devices } from "@playwright/test";
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
   reporter: "line",
@@ -9,9 +9,10 @@ module.exports = defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "PORT=4173 python3 server.py",
+    command: "npm run build && npm run start -- --port 4173 --hostname 127.0.0.1",
     url: "http://127.0.0.1:4173/health",
     reuseExistingServer: !process.env.CI,
+    timeout: 240_000,
   },
   projects: [
     { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },

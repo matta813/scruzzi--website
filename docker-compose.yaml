@@ -6,7 +6,7 @@ services:
     ports:
       - "8085:8080"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -18,5 +18,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.20'
-          memory: 128M
+          cpus: '0.50'
+          memory: 192M

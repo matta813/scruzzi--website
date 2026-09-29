@@ -1,53 +1,40 @@
-FROM python:3.14-alpine@sha256:c6ead215bfd31f1e433d968853b7a769989117115b728874824e6c0a27cb96fc AS asset-compressor
+ARG NODE_IMAGE=node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
 
-RUN apk add --no-cache brotli
+FROM ${NODE_IMAGE} AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 
-WORKDIR /assets
+FROM ${NODE_IMAGE} AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
 
-COPY style.css main.js theme.js ./
-
-RUN brotli --best --force style.css main.js theme.js
-
-FROM python:3.14-alpine@sha256:c6ead215bfd31f1e433d968853b7a769989117115b728874824e6c0a27cb96fc
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
+FROM ${NODE_IMAGE} AS runner
 WORKDIR /app
 
-# Apply the fixed Alpine package before removing Python's build tooling. The
-# pinned base image currently contains a vulnerable libuuid release.
-RUN apk upgrade --no-cache libuuid \
-    && rm -rf /usr/local/lib/python3.14/site-packages/pip \
-        /usr/local/lib/python3.14/site-packages/pip-*.dist-info \
-        /usr/local/bin/pip \
-        /usr/local/bin/pip3 \
-        /usr/local/bin/pip3.14
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=8080 \
+    HOSTNAME=0.0.0.0
 
-RUN addgroup -S app && adduser -S -G app app \
-    && mkdir -p /app/public \
-    && chown -R app:app /app
+# The standalone server needs only the Node runtime; drop the package managers
+# so the image carries fewer tools and fewer scanner findings.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+        /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /opt/yarn* \
+        /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
-COPY --chown=app:app server.py /app/server.py
-COPY --chown=app:app index.html /app/public/index.html
-COPY --chown=app:app 404.html /app/public/404.html
-COPY --chown=app:app style.css /app/public/style.css
-COPY --chown=app:app main.js /app/public/main.js
-COPY --chown=app:app theme.js /app/public/theme.js
-COPY --from=asset-compressor --chown=app:app /assets/style.css.br /app/public/style.css.br
-COPY --from=asset-compressor --chown=app:app /assets/main.js.br /app/public/main.js.br
-COPY --from=asset-compressor --chown=app:app /assets/theme.js.br /app/public/theme.js.br
-COPY --chown=app:app favicon.svg /app/public/favicon.svg
-COPY --chown=app:app robots.txt /app/public/robots.txt
-COPY --chown=app:app sitemap.xml /app/public/sitemap.xml
-COPY --chown=app:app social-preview.png /app/public/social-preview.png
-COPY --chown=app:app fonts/mona-sans.woff2 fonts/jetbrains-mono.woff2 /app/public/fonts/
+COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
-USER app
+USER node
 
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3)" || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD node -e "fetch('http://127.0.0.1:8080/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
-CMD ["python", "/app/server.py"]
+CMD ["node", "server.js"]

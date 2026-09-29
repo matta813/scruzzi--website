@@ -33,21 +33,6 @@ updates:
         patterns:
           - "*"
 
-  - package-ecosystem: pip
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "04:30"
-      timezone: Etc/UTC
-    labels:
-      - dependencies
-      - python
-    groups:
-      python-dev-tools:
-        patterns:
-          - "*"
-
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -59,6 +44,12 @@ updates:
       - dependencies
       - javascript
     groups:
+      next:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+          - "react"
+          - "react-dom"
       node-dev-tools:
         patterns:
           - "*"

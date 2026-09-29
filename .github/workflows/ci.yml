@@ -21,31 +21,26 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          python-version: "3.14"
-          cache: pip
-          cache-dependency-path: requirements-dev.txt
-      - run: pip install --requirement requirements-dev.txt
-      - run: ruff check server.py tests/
-      - run: python -m pytest tests/ -v
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
       - name: Build and smoke-test container
         run: |
           docker build --tag scruzzi-website:test .
           container_id=$(docker run --detach --read-only --cap-drop ALL --tmpfs /tmp --publish 127.0.0.1:8085:8080 scruzzi-website:test)
           trap 'docker rm --force "$container_id"' EXIT
-          for _ in 1 2 3 4 5; do
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
             if curl --fail --silent http://127.0.0.1:8085/health >/dev/null; then
               break
             fi
             sleep 1
           done
           test "$(curl --fail --silent http://127.0.0.1:8085/health)" = '{"status": "ok"}'
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version: "22"
-          cache: npm
-      - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - name: Check commit messages

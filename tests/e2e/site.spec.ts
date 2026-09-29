@@ -1,15 +1,21 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+// Opens the home page and waits until the boot screen has dissolved.
+async function openHome(page: Page) {
+  await page.goto("/");
+  await expect(page.locator(".preloader")).toHaveCount(0, { timeout: 15_000 });
+}
 
 test("page has no serious accessibility violations", async ({ page }) => {
-  await page.goto("/");
-  await page.waitForTimeout(2500); // let the intro animation settle
+  await openHome(page);
+  await page.waitForTimeout(1800); // let the intro scramble settle
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations.filter(({ impact }) => ["critical", "serious"].includes(impact ?? ""))).toEqual([]);
 });
 
 test("page has no horizontal overflow", async ({ page }) => {
-  await page.goto("/");
+  await openHome(page);
   const dimensions = await page.evaluate(() => ({
     viewport: document.documentElement.clientWidth,
     content: document.documentElement.scrollWidth,
@@ -18,7 +24,7 @@ test("page has no horizontal overflow", async ({ page }) => {
 });
 
 test("document has one main heading, language and structured data", async ({ page }) => {
-  await page.goto("/");
+  await openHome(page);
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
   await expect(page.locator("h1")).toHaveCount(1);
   const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
@@ -28,7 +34,7 @@ test("document has one main heading, language and structured data", async ({ pag
 });
 
 test("portfolio links to source and public work samples", async ({ page }) => {
-  await page.goto("/");
+  await openHome(page);
   for (const href of [
     "https://github.com/matta813/scruzzi--website",
     "https://github.com/matta813/velora-dns",
@@ -40,7 +46,7 @@ test("portfolio links to source and public work samples", async ({ page }) => {
 });
 
 test("operations switch the detail view", async ({ page }) => {
-  await page.goto("/");
+  await openHome(page);
   const stage = page.locator("#ops-stage");
   await expect(stage.getByRole("heading", { level: 3 })).toHaveText("Zwei-Node-Proxmox-Cluster");
   const button = page.getByRole("button", { name: /Netzwerk & DNS/ }).first();
@@ -50,7 +56,7 @@ test("operations switch the detail view", async ({ page }) => {
 });
 
 test("menu supports link, outside-click and keyboard dismissal", async ({ page }) => {
-  await page.goto("/");
+  await openHome(page);
   const toggle = page.locator("[aria-controls='nav-panel']");
 
   await toggle.click();
@@ -81,6 +87,15 @@ test("health endpoint and security headers", async ({ request }) => {
   expect(headers["x-frame-options"]).toBe("DENY");
   expect(headers["strict-transport-security"]).toContain("max-age=");
   expect(headers["x-powered-by"]).toBeUndefined();
+});
+
+test("boot screen counts up and then dissolves", async ({ page }) => {
+  await page.goto("/");
+  const loader = page.locator(".preloader");
+  await expect(loader).toBeVisible();
+  await expect(loader).toContainText("%");
+  await expect(loader).toHaveCount(0, { timeout: 15_000 });
+  await expect(page.locator("html")).not.toHaveClass(/is-loading/);
 });
 
 test("unknown routes render the custom 404 page", async ({ page }) => {

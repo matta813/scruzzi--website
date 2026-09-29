@@ -3,7 +3,9 @@
 import { useRef } from "react";
 import { hero, manifesto, site } from "@/content/site";
 import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
+import { introReady } from "@/lib/intro";
 import { DitherPortrait } from "./DitherPortrait";
+import { Scramble } from "./Scramble";
 
 // Hero and manifesto share one sticky visual that stays while the text scrolls past.
 export function Intro() {
@@ -13,11 +15,11 @@ export function Intro() {
     () => {
       if (prefersReducedMotion()) return;
 
-      gsap
-        .timeline({ defaults: { ease: "expo.out", duration: 1.4 } })
-        .from("[data-name-line]", { yPercent: 105, stagger: 0.12 }, 0.15)
-        .from("[data-hero-fade]", { autoAlpha: 0, y: 16, stagger: 0.06, duration: 1 }, 0.5)
-        .from("[data-visual]", { autoAlpha: 0, scale: 1.04, duration: 2.2 }, 0);
+      const intro = gsap
+        .timeline({ paused: true, defaults: { ease: "expo.out", duration: 1.4 } })
+        .from("[data-hero-fade]", { autoAlpha: 0, y: 16, stagger: 0.05, duration: 1 }, 0.1)
+        .from("[data-visual]", { autoAlpha: 0, scale: 1.06, duration: 2.4 }, 0);
+      introReady.then(() => intro.play());
 
       gsap.to("[data-hero-copy]", {
         yPercent: -18,
@@ -67,17 +69,17 @@ export function Intro() {
           >
             <span className="flex justify-between">
               <span>E-Mail</span>
-              <span className="text-bone">{site.email}</span>
+              <Scramble text={site.email} className="text-bone" duration={0.9} />
             </span>
             <span className="flex justify-between">
               <span>GitHub</span>
-              <span className="text-bone">matta813</span>
+              <Scramble text="matta813" className="text-bone" duration={0.9} delay={0.1} />
             </span>
           </a>
 
           <p data-hero-fade className="col-start-5 hidden items-start justify-between md:flex">
             <span className="micro">Aus</span>
-            <span className="display -mt-2 text-[clamp(4rem,8vw,7.5rem)] leading-[0.8] text-bone">{site.country}</span>
+            <Scramble text={site.country} className="display -mt-2 text-[clamp(4rem,8vw,7.5rem)] leading-[0.8] text-bone" delay={0.2} />
           </p>
 
           <p
@@ -96,22 +98,14 @@ export function Intro() {
               {hero.noteTop}
             </p>
             <h1 className="display text-[clamp(4.2rem,15vw,10.5rem)] text-bone">
-              <span className="block overflow-hidden md:pl-[25%]">
-                <span data-name-line className="block">
-                  {site.firstName}
-                </span>
-              </span>
-              <span className="block overflow-hidden">
-                <span data-name-line className="block">
-                  {site.lastName}
-                </span>
-              </span>
+              <Scramble text={site.firstName} className="block md:pl-[25%]" duration={1.2} />
+              <Scramble text={site.lastName} className="block" duration={1.4} delay={0.1} />
             </h1>
             <p data-hero-fade className="micro mt-3 md:absolute md:bottom-2 md:left-[62%] md:mt-0">
               {hero.noteBottom}
             </p>
-            <p data-hero-fade className="display absolute right-0 bottom-0 hidden text-5xl text-bone md:block md:right-[4%]">
-              {hero.stamp}
+            <p className="display absolute right-0 bottom-0 hidden text-5xl text-bone md:block md:right-[4%]">
+              <Scramble text={hero.stamp} delay={0.4} />
             </p>
           </div>
 

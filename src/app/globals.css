@@ -222,6 +222,15 @@
   .menu-panel[data-open="true"] .menu-item:nth-child(4) a { transition-delay: 0.15s, 0s; }
   .menu-panel[data-open="true"] .menu-item:nth-child(5) a { transition-delay: 0.2s, 0s; }
 
+  /* Boot screen; the CSS failsafe hides it even if JavaScript never runs */
+  .preloader {
+    animation: preloader-failsafe 0.01s linear 9s forwards;
+  }
+
+  .preloader[data-phase="dissolve"] .preloader-frame {
+    display: none;
+  }
+
   .sr-only-focusable:not(:focus) {
     position: absolute;
     width: 1px;
@@ -230,6 +239,18 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+}
+
+@keyframes preloader-failsafe {
+  to {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+html.is-loading,
+html.is-loading body {
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,3 +1,5 @@
+## [2.0.2](https://github.com/matta813/scruzzi--website/compare/v2.0.1...v2.0.2) (2026-09-30)
+
 ## [2.0.1](https://github.com/matta813/scruzzi--website/compare/v2.0.0...v2.0.1) (2026-09-29)
 
 ## [2.0.0](https://github.com/matta813/scruzzi--website/compare/v1.8.0...v2.0.0) (2026-09-29)

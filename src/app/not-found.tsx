@@ -17,7 +17,7 @@ export default function NotFound() {
         </p>
         <div className="mt-10 grid gap-8 md:grid-cols-5">
           <div className="md:col-span-2">
-            <p className="chip">Not found</p>
+            <p className="chip">Nicht gefunden</p>
             <h1 className="display mt-5 text-[clamp(2.8rem,6vw,5rem)] text-bone">Diese Route läuft ins Leere.</h1>
             <p className="mt-4 text-mute">Die gesuchte Seite existiert nicht oder wurde verschoben.</p>
           </div>

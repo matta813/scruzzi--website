@@ -14,8 +14,8 @@ export function Contact() {
           </h2>
           <p className="mt-6 max-w-[28rem] text-ink/75">{contact.text}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href={`mailto:${site.email}`} className="hud-btn hud-btn-dark">
-              Nachricht schreiben
+            <a href={`mailto:${site.contactEmail}`} className="hud-btn hud-btn-dark tracking-[0.06em] normal-case">
+              {site.contactEmail}
             </a>
             <a href={site.sourceUrl} rel="noopener noreferrer" className="hud-btn hud-btn-outline">
               Quellcode dieser Website
@@ -23,7 +23,7 @@ export function Contact() {
           </div>
         </div>
 
-        <dl className="grid grid-cols-2 gap-8 self-end md:col-span-3 md:col-start-3 md:grid-cols-3">
+        <dl className="grid grid-cols-2 gap-8 self-end md:col-span-3 md:col-start-3">
           <div>
             <dt className="micro text-ink/65">Profil</dt>
             <dd className="mt-2">
@@ -40,14 +40,6 @@ export function Contact() {
               </a>
             </dd>
           </div>
-          <div>
-            <dt className="micro text-ink/65">E-Mail</dt>
-            <dd className="mt-2">
-              <a className="font-display font-semibold tracking-[0.08em] uppercase hover:underline" href={`mailto:${site.email}`}>
-                {site.email}
-              </a>
-            </dd>
-          </div>
         </dl>
       </div>
 
@@ -57,7 +49,7 @@ export function Contact() {
 
       <div className="flex flex-wrap justify-between gap-2 border-t border-ink/20 px-4 py-5 md:px-8">
         <p className="micro text-ink/70">© {new Date().getFullYear()} {site.fullName}</p>
-        <p className="micro text-ink/70">Selbst gehostet im eigenen Homelab</p>
+        <p className="micro text-ink/70">Läuft auf eigener Hardware</p>
       </div>
     </footer>
   );

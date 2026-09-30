@@ -114,7 +114,7 @@ export function Intro() {
             aria-hidden="true"
             className="micro absolute right-2 bottom-24 hidden [writing-mode:vertical-rl] md:block"
           >
-            Scroll down
+            Scrollen
           </p>
         </div>
       </section>

@@ -82,7 +82,7 @@ export function Header() {
             onClick={() => setOpen((value) => !value)}
             className="hud-btn -mt-2 min-w-[5.5rem] justify-center"
           >
-            {open ? "Close" : "Menu"}
+            {open ? "Schliessen" : "Menü"}
           </button>
         </div>
 
@@ -92,7 +92,7 @@ export function Header() {
           inert={!open}
           className="menu-panel absolute top-12 right-0 w-full bg-panel p-6 md:w-[min(26rem,100%)]"
         >
-          <p className="micro mb-4">/ Menu</p>
+          <p className="micro mb-4">/ Menü</p>
           <ul className="mb-8">
             {navigation.map((item, index) => (
               <li key={item.href} className="menu-item overflow-hidden border-b border-line">
@@ -109,7 +109,7 @@ export function Header() {
               </li>
             ))}
           </ul>
-          <p className="micro mb-3">/ Connect</p>
+          <p className="micro mb-3">/ Links</p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {site.socials.map((social) => (
               <li key={social.href}>
@@ -119,7 +119,7 @@ export function Header() {
               </li>
             ))}
             <li>
-              <a href={`mailto:${site.email}`} className="micro text-bone hover:text-lime">
+              <a href={`mailto:${site.contactEmail}`} className="micro text-bone hover:text-lime">
                 E-Mail
               </a>
             </li>

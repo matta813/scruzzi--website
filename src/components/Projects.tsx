@@ -53,9 +53,9 @@ export function Projects() {
         <header className="lg:w-[34vw] lg:shrink-0 lg:pt-[8vh]">
           <p className="chip chip-dark">Open Source</p>
           <h2 id="projekte-title" className="display mt-5 text-[clamp(3rem,7vw,7rem)] text-ink">
-            Öffentliche Arbeits&shy;proben
+            Arbeits&shy;proben
           </h2>
-          <p className="mt-6 max-w-[26rem] text-ink/75">Drei Projekte, deren Architektur und Umsetzung im Quellcode nachvollziehbar sind.</p>
+          <p className="mt-6 max-w-[26rem] text-ink/75">Code und Architektur zum Nachlesen auf GitHub.</p>
         </header>
 
         {projects.map((project, index) => (

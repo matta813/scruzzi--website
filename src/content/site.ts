@@ -12,6 +12,7 @@ export const site = {
   description:
     "Mattia, Plattformentwickler EFZ im 3. Lehrjahr: Virtualisierung, Netzwerk, Automation und Self-Hosting im eigenen Homelab.",
   email: "mattia@scruzzi.com",
+  contactEmail: "kontakt@scruzzi.com",
   place: "Schweiz, CH",
   country: "CH",
   timeZone: "Europe/Zurich",
@@ -26,7 +27,7 @@ export const site = {
 
 export const hero = {
   intro: {
-    before: "Ich bin Lernender im dritten Lehrjahr mit einer Schwäche für",
+    before: "Ich bin Lernender mit einer Schwäche für",
     red: "Hardware",
     middle: "und",
     code: "<automation/>",
@@ -38,15 +39,15 @@ export const hero = {
 };
 
 export const manifesto = {
-  text: "Gute Infrastruktur entsteht nicht durch Tools allein. Sie wächst durch Nachtschichten im Homelab, kaputte Updates und ein Backup, das man zum Glück nie gebraucht hat.",
+  text: "Gute Infrastruktur entsteht nicht durch Tools allein. Sie wächst durch lange Abende, kaputte Updates und ein Backup, das man zum Glück nie gebraucht hat.",
   aside: ["„Nur noch", "ein Update.“"],
 };
 
 export const stats = [
   { value: 2, label: "Proxmox-Nodes" },
   { value: 14, label: "VMs & Container" },
-  { value: 3, label: "Lehrjahr" },
-  { value: 3, label: "Öffentliche Projekte" },
+  { value: 3, label: "Netzwerkzonen" },
+  { value: 2, label: "Redundante Kerndienste" },
 ];
 
 export const skills = [
@@ -62,16 +63,16 @@ export const operations = [
   {
     id: "cluster",
     short: "Proxmox-Cluster",
-    tag: "VMs und LXC",
+    tag: "Fundament aller Dienste",
     dot: "PVE",
     title: "Zwei-Node-Proxmox-Cluster",
-    text: "Ein Proxmox-VE-Cluster mit zwei Nodes bildet die Basis. Alle Dienste laufen getrennt in virtuellen Maschinen oder schlanken LXC-Containern.",
-    result: "Dienste lassen sich einzeln sichern, verschieben und neu starten.",
+    text: "Jede Anwendung läuft isoliert in einer VM oder einem schlanken LXC-Container.",
+    result: "Jeder Dienst lässt sich einzeln verschieben und neu starten.",
   },
   {
     id: "network",
     short: "Netzwerk & DNS",
-    tag: "VLANs, Redundanz",
+    tag: "Zonen & Ausfallsicherheit",
     dot: "DNS",
     title: "Segmentiertes Netzwerk",
     text: "VLANs trennen Verwaltung, Proxy und übrige Dienste. DNS und Zeitserver laufen redundant auf beiden Nodes, ein zentraler Reverse Proxy veröffentlicht die Anwendungen.",
@@ -80,28 +81,28 @@ export const operations = [
   {
     id: "cloud",
     short: "Eigene Cloud",
-    tag: "Dateien, Fotos, Passwörter",
+    tag: "Datenhoheit",
     dot: "CLOUD",
     title: "Self-Hosted statt Abo",
-    text: "Dateisynchronisation, Fotoverwaltung und ein Passwortmanager laufen selbst gehostet im eigenen Netz statt bei externen Anbietern.",
-    result: "Persönliche Daten bleiben unter eigener Kontrolle.",
+    text: "Dateisync, Fotoverwaltung und Passwortmanager laufen im eigenen Netz.",
+    result: "Persönliche Daten bleiben unter meiner Kontrolle.",
   },
   {
     id: "compute",
     short: "Container & Datenbank",
-    tag: "Docker-Hosts, SQL",
+    tag: "Apps & Backend",
     dot: "DB",
-    title: "Container-Hosts und Datenbankserver",
-    text: "Zwei Docker-Hosts betreiben containerisierte Anwendungen, ein eigener Datenbankserver dient als gemeinsames Backend. Eine Entwicklungs-VM ergänzt das Setup.",
-    result: "Neue Anwendungen sind schnell bereitgestellt und nutzen eine gemeinsame Datenbasis.",
+    title: "Anwendungsplattform",
+    text: "Zwei Docker-Hosts betreiben containerisierte Anwendungen, ein dedizierter Datenbankserver liefert das Backend. Eine Entwicklungs-VM ergänzt das Setup.",
+    result: "Neue Anwendungen sind schnell bereitgestellt, die Datenbank steht schon bereit.",
   },
   {
     id: "backup",
     short: "Backup",
-    tag: "Proxmox Backup Server",
+    tag: "Notfallplan",
     dot: "PBS",
     title: "Sicherungen im eigenen Rechenzentrum",
-    text: "Ein Proxmox Backup Server sichert virtuelle Maschinen und Container. Aufbewahrung und Wiederherstellung baue ich schrittweise weiter aus.",
+    text: "Ein Proxmox Backup Server sichert alle VMs und Container. Aufbewahrung und Restore-Tests baue ich schrittweise aus.",
     result: "Einzelne Systeme lassen sich ohne kompletten Neuaufbau zurückholen.",
   },
 ];
@@ -110,7 +111,7 @@ export const pipeline = [
   { name: "Git", text: "Versionierte Änderung" },
   { name: "CI", text: "Lint, Tests und Build" },
   { name: "Scan", text: "Image-Prüfung mit Trivy" },
-  { name: "Release", text: "Image in GHCR, Rollout im Homelab" },
+  { name: "Release", text: "Image in GHCR, automatischer Rollout" },
 ];
 
 export const projects = [
@@ -118,7 +119,7 @@ export const projects = [
     name: "Velora DNS",
     tag: "Go + React",
     dot: "DNS",
-    text: "Schlanker, selbst gehosteter DNS-Server mit verschlüsselten Protokollen, Blocklisten und React-Verwaltungsoberfläche. Aktuell in der Beta.",
+    text: "Schlanker DNS-Server mit verschlüsselten Protokollen, Blocklisten und React-Oberfläche. Aktuell in der Beta.",
     href: "https://github.com/matta813/velora-dns",
   },
   {
@@ -138,21 +139,21 @@ export const projects = [
 ];
 
 export const about = {
-  title: "Verantwortung für laufende Systeme",
+  title: "Zwischen Betrieb und Serverschrank",
   lead: "Mich fasziniert, was hinter den Kulissen von Software passiert: Server, Netzwerke, Deployments. Die Infrastruktur, auf der alles läuft.",
   paragraphs: [
-    "Ich bin im dritten Lehrjahr als Plattformentwickler EFZ bei einem IT-Dienstleister in der Nordwestschweiz. Im Alltag geht es um Support, Clientmanagement mit Microsoft Intune, Backups und Security für Kundinnen und Kunden.",
-    "Daneben betreibe ich ein eigenes Homelab auf Proxmox mit getrennten Netzwerkzonen, redundanten Kerndiensten und eigenen Backups. Dort teste ich, was ich in Schule und Betrieb lerne, und entwickle eigene Projekte, vom DNS-Server bis zum kleinen Game.",
+    "Meine Lehre mache ich bei einem IT-Dienstleister. Im Alltag geht es um Support, Clientmanagement mit Microsoft Intune, Backups und Security für Kundinnen und Kunden.",
+    "Nebenbei baue ich mein Homelab aus. Dort probiere ich aus, was ich in Schule und Betrieb lerne, und mache die Fehler, die im Kundenumfeld teuer wären.",
   ],
   facts: [
     { label: "Ausbildung", value: "Plattformentwickler EFZ, 3. Lehrjahr" },
     { label: "Standort", value: "Nordwestschweiz" },
-    { label: "Schwerpunkt", value: "Infrastruktur, Virtualisierung, Automation" },
+    { label: "Schwerpunkt", value: "Virtualisierung, Netzwerk, Automation" },
   ],
 };
 
 export const contact = {
-  title: ["Lass uns gute", "Infrastruktur", "bauen"],
+  title: ["Lass uns", "reden"],
   text: "Fragen zu meinem Setup, Feedback oder berufliche Anknüpfungspunkte: ich freue mich über jede Nachricht.",
   wordmark: "Portfolio/Mattia",
 };

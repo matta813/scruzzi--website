@@ -15,7 +15,7 @@ Lenis-Smooth-Scroll, ausgeliefert als Standalone-Node-Server im Container.
 | `src/components/DitherPortrait.tsx` | RGB-Dot-Matrix-Visual; nimmt optional ein Foto über `src` |
 | `src/lib/` | GSAP-Registrierung, Web-Audio-Sound |
 | `src/proxy.ts` | Content-Security-Policy mit Nonce pro Request |
-| `next.config.ts` | Standalone-Output und statische Security-Header |
+| `next.config.ts` | Standalone-Output, statische Security-Header, Umami-Rewrites |
 | `public/` | Social-Preview-Bild |
 | `tests/e2e/` | Playwright-Tests inkl. axe-Accessibility-Check |
 
@@ -43,6 +43,34 @@ npm run typecheck
 npx playwright install chromium
 npm run test:e2e   # baut die App und startet sie auf Port 4173
 ```
+
+## Analytics
+
+Seitenaufrufe werden mit einer selbst gehosteten Umami-Instanz
+(`https://umami.scruzzi.com`) gezählt. Umami setzt keine Cookies.
+
+Der Tracker wird nicht direkt von der Umami-Domain geladen, sondern über die
+eigene Domain (First-Party-Proxy), weil Content-Blocker den
+Drittanbieter-Request verwerfen:
+
+| Pfad | Ziel |
+| --- | --- |
+| `/a/script.js` | `https://umami.scruzzi.com/script.js` |
+| `/a/api/send` | `https://umami.scruzzi.com/api/send` |
+
+- **Einbindung:** `<script defer src="/a/script.js" data-website-id="…" nonce={nonce}>`
+  in `src/app/layout.tsx`. Umami leitet den Event-Endpunkt aus dem
+  Script-Pfad ab und sendet deshalb automatisch an `/a/api/send`.
+- **Proxy:** `rewrites()` in `next.config.ts`. Nur diese beiden Pfade werden
+  weitergereicht; das Umami-Dashboard ist über die Seite nicht erreichbar.
+- **CSP:** Wegen `'strict-dynamic'` braucht das Script die Nonce. Für die
+  Events genügt `connect-src 'self'` in `src/proxy.ts`; ein Eintrag für die
+  Umami-Domain ist nicht nötig.
+- **Website-ID:** steht im `data-website-id`-Attribut und stammt aus dem
+  Umami-Dashboard (Einstellungen → Websites).
+- **Voraussetzung:** Der Container braucht ausgehenden HTTPS-Zugriff auf
+  `umami.scruzzi.com`. Ist Umami nicht erreichbar, bleibt die Seite
+  funktionsfähig, es werden nur keine Aufrufe gezählt.
 
 ## Release & Deployment
 

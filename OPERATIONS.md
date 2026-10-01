@@ -17,6 +17,9 @@ geprüft. SBOM und Build-Provenance werden zusammen mit dem Image publiziert.
   werden; bis dahin würde ein Zeitplan ausschließlich Fehlalarme erzeugen.
 - Ein Image kann über seinen unveränderlichen Digest oder
   `sha-<git-commit>` eindeutig einem Build zugeordnet werden.
+- Analytics: `GET /a/script.js` muss HTTP 200 mit JavaScript liefern. Ein
+  404 bedeutet, dass noch ein altes Image läuft; ein 502/504, dass der
+  Container `umami.scruzzi.com` nicht erreicht.
 
 ## Rollback
 

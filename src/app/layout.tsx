@@ -87,7 +87,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         />
         <script
           defer
-          src="https://umami.scruzzi.com/script.js"
+          src="/a/script.js"
           data-website-id="29e5d058-9e41-42c4-b9d4-0d0fde48e27a"
           nonce={nonce}
         />

@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // Umami is proxied first-party so content blockers do not drop it.
+  async rewrites() {
+    return [
+      { source: "/a/script.js", destination: "https://umami.scruzzi.com/script.js" },
+      { source: "/a/api/send", destination: "https://umami.scruzzi.com/api/send" },
+    ];
+  },
 };
 
 export default nextConfig;

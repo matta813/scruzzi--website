@@ -83,6 +83,8 @@ test("health endpoint and security headers", async ({ request }) => {
   const home = await request.get("/");
   const headers = home.headers();
   expect(headers["content-security-policy"]).toContain("script-src 'self' 'nonce-");
+  expect(headers["content-security-policy"]).toContain("connect-src 'self' https://umami.scruzzi.com");
+  expect(await home.text()).toContain('src="https://umami.scruzzi.com/script.js"');
   expect(headers["x-content-type-options"]).toBe("nosniff");
   expect(headers["x-frame-options"]).toBe("DENY");
   expect(headers["strict-transport-security"]).toContain("max-age=");

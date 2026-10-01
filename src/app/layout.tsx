@@ -85,6 +85,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c") }}
         />
+        <script
+          defer
+          src="https://umami.scruzzi.com/script.js"
+          data-website-id="29e5d058-9e41-42c4-b9d4-0d0fde48e27a"
+          nonce={nonce}
+        />
       </body>
     </html>
   );

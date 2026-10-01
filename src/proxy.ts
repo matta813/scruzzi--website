@@ -13,7 +13,7 @@ export function proxy(request: NextRequest) {
     "img-src 'self' blob: data:",
     "font-src 'self'",
     "media-src 'self'",
-    "connect-src 'self'",
+    "connect-src 'self' https://umami.scruzzi.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

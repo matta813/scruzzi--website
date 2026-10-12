@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
-import { site } from "@/content/site";
+import { site, skills } from "@/content/site";
 import "./globals.css";
 
 const rajdhani = localFont({
@@ -21,13 +21,16 @@ const dmSans = localFont({
   display: "swap",
 });
 
-const title = "Mattia · Plattformentwickler";
+const title = "Mattia Scruzzi · Plattformentwickler EFZ";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title,
   description: site.description,
   alternates: { canonical: "/" },
+  authors: [{ name: site.fullName, url: site.url }],
+  creator: site.fullName,
+  formatDetection: { telephone: false },
   openGraph: {
     type: "website",
     url: "/",
@@ -57,14 +60,32 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-const personJsonLd = {
+const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: site.fullName,
-  jobTitle: site.jobTitle,
-  url: `${site.url}/`,
-  email: `mailto:${site.email}`,
-  sameAs: site.socials.map((social) => social.href),
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": `${site.url}/#person`,
+      name: site.fullName,
+      givenName: site.firstName,
+      familyName: site.lastName,
+      jobTitle: site.jobTitle,
+      url: `${site.url}/`,
+      image: `${site.url}/social-preview.png`,
+      email: `mailto:${site.email}`,
+      address: { "@type": "PostalAddress", addressCountry: site.country },
+      knowsAbout: skills.flatMap((skill) => skill.items),
+      sameAs: site.socials.map((social) => social.href),
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      url: `${site.url}/`,
+      name: site.fullName,
+      inLanguage: "de-CH",
+      publisher: { "@id": `${site.url}/#person` },
+    },
+  ],
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -73,6 +94,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="de" className={`${rajdhani.variable} ${dmSans.variable}`}>
       <body>
+        <noscript>
+          <style nonce={nonce}>{".preloader{display:none}"}</style>
+        </noscript>
         <a
           href="#main"
           className="sr-only-focusable fixed top-4 left-4 z-50 bg-lime px-4 py-2 font-display font-semibold tracking-widest text-ink uppercase"
@@ -83,7 +107,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <script
           type="application/ld+json"
           nonce={nonce}
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c") }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
         <script
           defer

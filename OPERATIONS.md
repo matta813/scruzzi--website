@@ -36,3 +36,12 @@ geprüft. SBOM und Build-Provenance werden zusammen mit dem Image publiziert.
 Wenn ein Scan den Release blockiert, wird das unsichere Image nicht
 veröffentlicht. Nur nach dokumentierter Risikobewertung darf eine konkrete
 Schwachstelle temporär ausgenommen werden.
+
+## Bekannte Auffälligkeit: doppelter HSTS-Header
+
+Die Live-Antwort von `scruzzi.com` enthält zwei `Strict-Transport-Security`-Header:
+einen von Next.js (`max-age=63072000; includeSubDomains`, siehe `next.config.ts`)
+und einen vom vorgelagerten OpenResty (`max-age=63072000; preload`). Browser
+werten nur einen aus. Empfehlung: den Header nur noch im Reverse Proxy setzen
+(`max-age=63072000; includeSubDomains; preload`) und danach den Eintrag in
+`next.config.ts` entfernen.

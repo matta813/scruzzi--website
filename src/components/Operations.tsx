@@ -70,7 +70,7 @@ export function Operations() {
           ))}
         </div>
 
-        <div id="ops-stage" aria-live="polite" className="relative lg:col-span-3 lg:px-6">
+        <div id="ops-stage" className="relative lg:col-span-3 lg:px-6">
           <div className="relative flex aspect-[16/8] items-center justify-center border border-line">
             {["-top-1 -left-1", "-top-1 -right-1", "-bottom-1 -left-1", "-right-1 -bottom-1"].map((corner) => (
               <span key={corner} aria-hidden="true" className={`absolute size-2 bg-bone/40 ${corner}`} />
@@ -79,7 +79,7 @@ export function Operations() {
               {current.dot}
             </p>
           </div>
-          <article data-stage-copy className="mx-auto mt-8 max-w-[40rem] text-center">
+          <article data-stage-copy aria-live="polite" className="mx-auto mt-8 max-w-[40rem] text-center">
             <h3 className="display mb-4 text-4xl text-bone">{current.title}</h3>
             <p className="text-mute">{current.text}</p>
             <p className="mt-6 inline-flex flex-col items-center gap-1 border-t border-line pt-4">

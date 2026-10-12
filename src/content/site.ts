@@ -20,9 +20,9 @@ export const site = {
   coordinates: ["46°48'05.0\"N", "8°13'37.0\"E"],
   sourceUrl: "https://github.com/matta813/scruzzi--website",
   socials: [
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/mattia-scruzzi-87b52a419" },
-    { label: "GitHub", href: "https://github.com/matta813" },
-  ] satisfies Link[],
+    { label: "LinkedIn", caption: "Profil", href: "https://www.linkedin.com/in/mattia-scruzzi-87b52a419" },
+    { label: "GitHub", caption: "Code", href: "https://github.com/matta813" },
+  ] satisfies (Link & { caption: string })[],
 } as const;
 
 export const hero = {

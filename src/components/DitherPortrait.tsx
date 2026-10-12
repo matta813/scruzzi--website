@@ -170,13 +170,15 @@ export function DitherPortrait({ src, className }: Props) {
       const scanY = ((time / 45) % (rows + 40)) - 20;
       const ledOn = new Set<number>();
       for (const led of leds) if (Math.sin(time / 1000 * led.speed + led.phase) > 0.1) ledOn.add(led.index);
+      const anyLed = ledOn.size > 0;
 
       for (let y = 0; y < rows; y++) {
         const scan = 0.12 * Math.exp(-(((y - scanY) / 2.5) ** 2));
         for (let x = 0; x < cols; x++) {
           const i = y * cols + x;
           let l = luminance[i];
-          if (ledOn.has(i)) l = 1;
+          const led = anyLed && ledOn.has(i);
+          if (led) l = 1;
           const dx = x - pointer.x;
           const dy = y - pointer.y;
           l += (0.18 + l) * 0.9 * Math.exp(-(dx * dx + dy * dy) / 160);
@@ -185,7 +187,6 @@ export function DitherPortrait({ src, className }: Props) {
 
           // Colour drifts from lime-green light on the left to violet/red shadow on the right.
           const t = x / cols;
-          const led = ledOn.has(i);
           const r = led ? 90 : 255 * l * (0.3 + 0.9 * t);
           const g = led ? 255 : 255 * l * (1.15 - 0.75 * t);
           const b = led ? 60 : 255 * l * (0.35 + 0.85 * t * (1 - y / rows * 0.4));
@@ -238,6 +239,7 @@ export function DitherPortrait({ src, className }: Props) {
       img.onload = () => {
         image = img;
         buildSource();
+        render(performance.now());
       };
       img.src = src;
     }

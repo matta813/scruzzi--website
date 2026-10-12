@@ -9,7 +9,7 @@ Lenis-Smooth-Scroll, ausgeliefert als Standalone-Node-Server im Container.
 | Pfad | Zweck |
 | --- | --- |
 | `src/content/site.ts` | Alle Inhalte (Texte, Skills, Projekte, Links) an einer Stelle |
-| `src/app/` | Layout, Startseite, 404, `robots.txt`, `sitemap.xml`, `/health` |
+| `src/app/` | Layout, Startseite, 404, `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, `apple-icon`, `/health` |
 | `src/app/fonts/` | Selbst gehostete Schriften (Rajdhani, DM Sans; SIL OFL) |
 | `src/components/` | Sektionen (Intro, Stats, Skills, Projekte, Betrieb, Pipeline, Über mich, Kontakt) und Effekte |
 | `src/components/DitherPortrait.tsx` | RGB-Dot-Matrix-Visual; nimmt optional ein Foto über `src` |

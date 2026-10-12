@@ -31,10 +31,13 @@ export function SoundToggle() {
       type="button"
       onClick={toggle}
       aria-pressed={on}
+      aria-label="Hintergrundsound"
       className="micro text-left transition-colors hover:text-bone group-[.on-lime]:text-ink/70"
     >
-      Sound <span className="px-1">-</span>
-      <span className="text-bone group-[.on-lime]:text-ink">{on ? "On" : "Off"}</span>
+      <span aria-hidden="true">
+        Sound <span className="px-1">-</span>
+        <span className="text-bone group-[.on-lime]:text-ink">{on ? "On" : "Off"}</span>
+      </span>
     </button>
   );
 }

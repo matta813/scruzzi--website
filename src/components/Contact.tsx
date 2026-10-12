@@ -24,22 +24,16 @@ export function Contact() {
         </div>
 
         <dl className="grid grid-cols-2 gap-8 self-end md:col-span-3 md:col-start-3">
-          <div>
-            <dt className="micro text-ink/65">Profil</dt>
-            <dd className="mt-2">
-              <a className="font-display font-semibold tracking-[0.14em] uppercase hover:underline" href={site.socials[0].href} rel="noopener noreferrer">
-                LinkedIn <span aria-hidden="true">↗</span>
-              </a>
-            </dd>
-          </div>
-          <div>
-            <dt className="micro text-ink/65">Code</dt>
-            <dd className="mt-2">
-              <a className="font-display font-semibold tracking-[0.14em] uppercase hover:underline" href={site.socials[1].href} rel="noopener noreferrer">
-                GitHub <span aria-hidden="true">↗</span>
-              </a>
-            </dd>
-          </div>
+          {site.socials.map((social) => (
+            <div key={social.href}>
+              <dt className="micro text-ink/65">{social.caption}</dt>
+              <dd className="mt-2">
+                <a className="font-display font-semibold tracking-[0.14em] uppercase hover:underline" href={social.href} rel="noopener noreferrer">
+                  {social.label} <span aria-hidden="true">↗</span>
+                </a>
+              </dd>
+            </div>
+          ))}
         </dl>
       </div>
 

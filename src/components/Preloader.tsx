@@ -35,7 +35,13 @@ export function Preloader() {
     html.classList.add("is-loading");
     window.scrollTo(0, 0);
 
-    const reduce = prefersReducedMotion();
+    // Repeat visits within a session get the short version of the boot screen.
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem("boot-seen") === "1";
+      sessionStorage.setItem("boot-seen", "1");
+    } catch {}
+    const reduce = prefersReducedMotion() || seen;
     const lines = {
       left: el.querySelector<HTMLElement>("[data-line='left']")!,
       right: el.querySelector<HTMLElement>("[data-line='right']")!,

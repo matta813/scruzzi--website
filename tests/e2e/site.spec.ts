@@ -28,7 +28,8 @@ test("document has one main heading, language and structured data", async ({ pag
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
   await expect(page.locator("h1")).toHaveCount(1);
   const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
-  expect(JSON.parse(jsonLd ?? "{}")["@type"]).toBe("Person");
+  const graph: { "@type": string }[] = JSON.parse(jsonLd ?? "{}")["@graph"];
+  expect(graph.map((node) => node["@type"])).toEqual(["Person", "WebSite"]);
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /social-preview\.png$/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://scruzzi.com");
 });
@@ -43,6 +44,26 @@ test("portfolio links to source and public work samples", async ({ page }) => {
   ]) {
     await expect(page.locator(`a[href="${href}"]`).first()).toBeAttached();
   }
+});
+
+test("repeat visits in a session get the short boot screen", async ({ page }) => {
+  await openHome(page);
+  const started = Date.now();
+  await page.reload();
+  await expect(page.locator(".preloader")).toHaveCount(0, { timeout: 15_000 });
+  expect(Date.now() - started).toBeLessThan(4_000);
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("boot screen is hidden and counters show their values", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".preloader")).toBeHidden();
+    await expect(page.locator("h1")).toContainText("Mattia");
+    await expect(page.locator("[data-reel]").first()).toHaveClass(/translate-y-0/);
+    await expect(page.locator("[data-reel][data-digit='4']").first()).toHaveClass(/-translate-y-\[40%\]/);
+  });
 });
 
 test("operations switch the detail view", async ({ page }) => {
@@ -105,6 +126,15 @@ test("unknown routes render the custom 404 page", async ({ page }) => {
   const response = await page.goto("/does-not-exist");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Diese Route läuft ins Leere.");
+});
+
+test("manifest and touch icon are served", async ({ request }) => {
+  const manifest = await request.get("/manifest.webmanifest");
+  expect(manifest.status()).toBe(200);
+  expect((await manifest.json()).name).toBe("Mattia Scruzzi");
+  const icon = await request.get("/apple-icon");
+  expect(icon.status()).toBe(200);
+  expect(icon.headers()["content-type"]).toContain("image/png");
 });
 
 test("crawler files are served", async ({ request }) => {

@@ -6,6 +6,20 @@ import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 
 const DIGITS = Array.from({ length: 10 }, (_, digit) => digit);
 
+// Final reel position as static classes, so the numbers are right without JavaScript.
+const REEL_OFFSET = [
+  "translate-y-0",
+  "-translate-y-[10%]",
+  "-translate-y-[20%]",
+  "-translate-y-[30%]",
+  "-translate-y-[40%]",
+  "-translate-y-[50%]",
+  "-translate-y-[60%]",
+  "-translate-y-[70%]",
+  "-translate-y-[80%]",
+  "-translate-y-[90%]",
+];
+
 // Odometer-style counters: each digit column rolls to its value when scrolled into view.
 export function Stats() {
   const root = useRef<HTMLElement>(null);
@@ -22,7 +36,7 @@ export function Stats() {
           reel,
           { yPercent: 0 },
           {
-            yPercent: -Number(reel.dataset.digit) * 10 - 0,
+            yPercent: -Number(reel.dataset.digit) * 10,
             duration: 1.8,
             delay: index * 0.08,
             ease: "expo.out",
@@ -47,7 +61,7 @@ export function Stats() {
               <div aria-hidden="true" className="display flex h-[0.86em] overflow-hidden text-[clamp(4.5rem,9vw,8rem)] text-bone">
                 {digits.map((digit, position) => (
                   <span key={position} className="relative block h-full w-[0.5em]">
-                    <span data-reel data-digit={digit} className="absolute inset-x-0 top-0 flex flex-col">
+                    <span data-reel data-digit={digit} className={`absolute inset-x-0 top-0 flex flex-col ${REEL_OFFSET[Number(digit)]}`}>
                       {DIGITS.map((value) => (
                         <span key={value} className="block h-[0.86em]">
                           {value}
